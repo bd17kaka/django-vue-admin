@@ -24,4 +24,3 @@ DATABASES = {
 `python manage.py createsuperuser`
 这里用户名，邮箱，密码可以自己设置。
 5、成功运行，在页面输入自己超级用户的账户和密码即可登录，如果想要增删改一些数据，可在界面上提供的django后台进行操作。
-
