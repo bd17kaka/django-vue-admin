@@ -87,7 +87,7 @@
         </el-table>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑岗位':'新增岗位'">
+    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑岗位':'新增方案'">
       <el-form
         ref="Form"
         :model="solution"
@@ -110,7 +110,21 @@
         <el-form-item label="代码地址" prop="solutionName">
           <el-input v-model="solution.codeAddr" placeholder="代码地址" />
         </el-form-item>
+              <el-form-item label="上传文件" prop="dept">
+                <el-upload
+                  class="avatar-uploader"
+                  :action="upUrl"
+                  accept=".zip"
+                  :show-file-list="false"
+                  :on-success="handleAvatarSuccess"
+                  :before-upload="beforeAvatarUpload"
+                  :headers="upHeaders"
+                >
+                  <i class="el-icon-plus avatar-uploader-icon" />
+                </el-upload>
+        </el-form-item>
       </el-form>
+
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogFormVisible=false">取消</el-button>
         <el-button type="primary" @click="confirm('Form')">确认</el-button>
@@ -129,6 +143,7 @@ import {
 import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
 import {getTaskAll} from "@/api/task";
+import {upHeaders, upUrl} from "@/api/file";
 
 const defaultM = {
   id: '',
@@ -137,6 +152,8 @@ const defaultM = {
 export default {
   data() {
     return {
+      upHeaders: upHeaders(),
+      upUrl: upUrl(),
       solution: {
         id: '',
         solutionName: '',
@@ -162,6 +179,16 @@ export default {
   },
   methods: {
     checkPermission,
+    handleAvatarSuccess(res, file) {
+        this.user.avatar = res.data.path
+    },
+    beforeAvatarUpload(file) {
+      const notNull = file.size / 1024 / 1024 > 0;
+      if (!notNull) {
+        this.$message.error("文件不能为空");
+      }
+      return notNull;
+    },
     getList() {
       this.listLoading = true
       getSolutionAll().then(response => {
@@ -217,7 +244,6 @@ export default {
           // console.log("这里")
           // console.log(scope.row.solutionId)
           await deleteSolution(scope.row.solutionId)
-          console.log("这里2")
           // console.log(scope.row.id)
           this.getList()
           this.$message({
