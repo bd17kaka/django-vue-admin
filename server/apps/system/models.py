@@ -262,3 +262,15 @@ class solution(BaseModel):
 
     def __str__(self):
         return self.solutionName
+
+class Measurement(BaseModel):
+    name = models.CharField('名称', max_length=32, unique=True)
+    description = models.CharField('描述', max_length=500, blank=True, null=True)
+    addr = models.CharField('地址', max_length=500)
+
+    class Meta:
+        verbose_name = '评价指标'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name

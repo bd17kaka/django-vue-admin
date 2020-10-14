@@ -41,6 +41,14 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = '__all__'
 
+class MeasurementSerializer(serializers.ModelSerializer):
+    """
+    评价指标序列化
+    """
+    class Meta:
+        model = Measurement
+        fields = '__all__'
+        
 class DictTypeSerializer(serializers.ModelSerializer):
     """
     数据字典类型序列化
