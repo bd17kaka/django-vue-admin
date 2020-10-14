@@ -3,7 +3,7 @@ import re
 #from django_celery_beat.models import PeriodicTask
 from rest_framework import serializers
 
-from .models import (Dict, DictType, File, Organization, Permission, Position, Task,
+from .models import (Dict, DictType, File, Organization, Permission, Position, Task, Dataset, 
                      Role, User, solution)
 
 '''
@@ -33,6 +33,13 @@ class FileSerializer(serializers.ModelSerializer):
         model = File
         fields = "__all__"
 
+class DatasetSerializer(serializers.ModelSerializer):
+    """
+    数据集序列化
+    """
+    class Meta:
+        model = Dataset
+        fields = '__all__'
 
 class DictTypeSerializer(serializers.ModelSerializer):
     """

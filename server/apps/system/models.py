@@ -230,7 +230,7 @@ class File(CommonAModel):
     """
     name = models.CharField('名称', max_length=300, null=True, blank=True)
     size = models.IntegerField('文件大小', default=1, null=True, blank=True)
-    file = models.FileField('文件', upload_to='%Y/%m/%d/')
+    file = models.FileField('文件', upload_to='')
     type_choices = (
         ('文档', '文档'),
         ('视频', '视频'),

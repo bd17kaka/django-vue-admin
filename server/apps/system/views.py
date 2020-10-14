@@ -24,13 +24,13 @@ from utils.queryset import get_child_queryset2
 
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin
-from .models import (Dict, DictType, File, Organization, Permission, Position, Task, 
+from .models import (Dict, DictType, File, Organization, Permission, Position, Task, Dataset,
                      Role, User, solution)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
-                          PositionSerializer, RoleSerializer, TaskSerializer, 
+                          PositionSerializer, RoleSerializer, TaskSerializer, DatasetSerializer, 
                           UserCreateSerializer, UserListSerializer,
                           UserModifySerializer, solutionSerializer)
 
@@ -283,7 +283,7 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
         elif 'application' or 'text' in mime:
             type = '文档'
         instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-        instance.path = settings.MEDIA_URL + instance.file.name
+        instance.path = settings.MEDIA_URL + name
         instance.save()
 
 class solutionViewSet(ModelViewSet):
@@ -299,3 +299,17 @@ class solutionViewSet(ModelViewSet):
     search_fields = ['solutionId','solutionName', 'taskName']
     ordering_fields = ['pk']
     ordering=['pk']
+
+
+class DatasetViewSet(ModelViewSet):
+    '''
+    数据集-增删改查
+    '''
+    perms_map = {'get': '*', 'post': 'dataset_create',
+                 'put': 'dataset_update', 'delete': 'dataset_delete'}
+    queryset = Dataset.objects.all()
+    serializer_class = DatasetSerializer
+    pagination_class = None
+    search_fields = ['dataset_name']
+    ordering_fields = ['pk']
+    ordering = ['pk']    

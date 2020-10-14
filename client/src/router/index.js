@@ -100,6 +100,18 @@ export const asyncRoutes = [
         meta: { title: '岗位管理', icon: 'position', perms: ['position_manage'] }
       },
       {
+        path: 'dataset',
+        name: 'Dataset',
+        component: () => import('@/views/system/dataset'),
+        meta: { title: '数据集管理', icon: 'documentation', perms: ['dataset_manage'] }
+      },
+      {
+        path: 'task',
+        name: 'Task',
+        component: () => import('@/views/system/task'),
+        meta: { title: '任务管理', icon: 'documentation', perms: ['task_manage'] }
+      },
+      {
         path: 'dict',
         name: 'Dict',
         component: () => import('@/views/system/dict'),
@@ -111,12 +123,14 @@ export const asyncRoutes = [
         component: () => import('@/views/system/file'),
         meta: { title: '文件库', icon: 'documentation', perms: ['file_room'] }
       },
+      /*暂停使用
       {
         path: 'task',
         name: 'Task',
         component: () => import('@/views/system/task'),
         meta: { title: '定时任务', icon: 'list', perms: ['task_manage'] }
       }
+      */
     ]
   },
   {
