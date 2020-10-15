@@ -2,11 +2,11 @@ from .settings import *
 DEBUG = False
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'db',
-        'USER': 'postgres',
-        'PASSWORD': 'password',
-        'HOST': 'localhost',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.mysql',
+        'NAME': 'aishare',
+        'USER': 'root',
+        'PASSWORD': '123',
+        'HOST': '192.168.237.10',
+        'PORT': '3306',
     }
 }

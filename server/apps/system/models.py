@@ -6,6 +6,7 @@ from django.db.models.query import QuerySet
 from utils.model import SoftModel, BaseModel
 from simple_history.models import HistoricalRecords
 from django.contrib.postgres.fields import JSONField
+# from django_mysql.models import JSONField
 
 
 
