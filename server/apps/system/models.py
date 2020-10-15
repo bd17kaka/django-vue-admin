@@ -44,6 +44,22 @@ class Task(BaseModel):
         return self.task_name
 
 
+class Dataset(BaseModel):
+    '''
+    数据集
+    '''
+    
+    dataset_name = models.CharField('数据集名称', max_length=50)
+    description = models.CharField('数据集详情', max_length=2000, null=True)
+    addr = models.CharField('数据集地址', max_length=500)
+
+    class Meta:
+        verbose_name = '数据集'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.dataset_name
+
 
 class Permission(SoftModel):
     """
