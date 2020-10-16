@@ -116,6 +116,12 @@ export const asyncRoutes = [
         name: 'Task',
         component: () => import('@/views/system/task'),
         meta: { title: '定时任务', icon: 'list', perms: ['task_manage'] }
+      },
+      {
+        path: 'measurement',
+        name: 'Measurement',
+        component: () => import('@/views/system/measurement'),
+        meta: { title: '评价指标管理', icon: 'list', perms: ['measurement_manage'] }
       }
     ]
   },

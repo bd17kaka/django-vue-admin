@@ -6,6 +6,7 @@ media/
 *.log
 static/
 __pycache__/
+server/settings_dev.py
 *.pyc
 
 # client
@@ -15,6 +16,8 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 **/*.log
+
+
 
 tests/**/coverage/
 tests/e2e/reports

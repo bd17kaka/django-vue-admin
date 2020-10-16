@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserViewSet, OrganizationViewSet, PermissionViewSet, RoleViewSet, PositionViewSet, TestView, DictTypeViewSet, DictViewSet, TaskViewSet
+from .views import UserViewSet, OrganizationViewSet, PermissionViewSet, RoleViewSet, PositionViewSet, TestView, DictTypeViewSet, DictViewSet, TaskViewSet, MeasurementViewSet
 from rest_framework import routers
 
 
@@ -12,6 +12,7 @@ router.register('position', PositionViewSet, basename="position")
 router.register('dicttype', DictTypeViewSet, basename="dicttype")
 router.register('dict', DictViewSet, basename="dict")
 router.register('task', TaskViewSet, basename="task")
+router.register('measurement',MeasurementViewSet, basename="measurement")
 urlpatterns = [
     path('', include(router.urls)),
     path('test/', TestView.as_view())
