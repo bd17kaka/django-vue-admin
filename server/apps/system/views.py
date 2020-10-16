@@ -25,14 +25,14 @@ from utils.queryset import get_child_queryset2
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User, Measurement)
+                     Role, User, Measurement, Task, Dataset)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
                           PositionSerializer, RoleSerializer, TaskSerializer,
                           UserCreateSerializer, UserListSerializer,
-                          UserModifySerializer, MeasurementSerializer)
+                          UserModifySerializer, MeasurementSerializer, DatasetSerializer)
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -45,12 +45,12 @@ class LogoutView(APIView):
     def get(self, request, *args, **kwargs):  # 可将token加入黑名单
         return Response(status=status.HTTP_200_OK)
 
-class TaskViewSet(ModelViewSet):
-    queryset = PeriodicTask.objects.all()
-    serializer_class = TaskSerializer
-    search_fields = ['name']
-    filterset_fields = ['enabled']
-    ordering = ['-pk']
+# class TaskViewSet(ModelViewSet):
+#     queryset = PeriodicTask.objects.all()
+#     serializer_class = TaskSerializer
+#     search_fields = ['name']
+#     filterset_fields = ['enabled']
+#     ordering = ['-pk']
 
 
 
@@ -283,4 +283,32 @@ class MeasurementViewSet(ModelViewSet):
     pagination_class = None
     search_fields = ['name']
     ordering_fields = ['sort']
+    ordering = ['pk']
+
+
+class TaskViewSet(ModelViewSet):
+    '''
+    任务-增删改查
+    '''
+    perms_map = {'get': '*', 'post': 'task_create',
+                 'put': 'task_update', 'delete': 'task_delete'}
+    queryset = Task.objects.all()
+    serializer_class = TaskSerializer
+    pagination_class = None
+    search_fields = ['task_name','description']
+    ordering_fields = ['pk']
+    ordering = ['pk']
+
+
+class DatasetViewSet(ModelViewSet):
+    '''
+    数据集-增删改查
+    '''
+    perms_map = {'get': '*', 'post': 'dataset_create',
+                 'put': 'dataset_update', 'delete': 'dataset_delete'}
+    queryset = Dataset.objects.all()
+    serializer_class = DatasetSerializer
+    pagination_class = None
+    search_fields = ['dataset_name']
+    ordering_fields = ['pk']
     ordering = ['pk']

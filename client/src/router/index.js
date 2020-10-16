@@ -74,7 +74,7 @@ export const asyncRoutes = [
         component: () => import('@/views/system/user.vue'),
         meta: { title: '用户管理', icon: 'user', perms: ['user_manage'] }
       },
-     {
+      {
         path: 'user/password',
         name: 'ChangePassword',
         component: () => import('@/views/system/changepassword'),
@@ -111,17 +111,29 @@ export const asyncRoutes = [
         component: () => import('@/views/system/file'),
         meta: { title: '文件库', icon: 'documentation', perms: ['file_room'] }
       },
-      {
-        path: 'task',
-        name: 'Task',
-        component: () => import('@/views/system/task'),
-        meta: { title: '定时任务', icon: 'list', perms: ['task_manage'] }
-      },
+      // {
+      //   path: 'task',
+      //   name: 'Task',
+      //   component: () => import('@/views/system/task'),
+      //   meta: { title: '定时任务', icon: 'list', perms: ['task_manage'] }
+      // },
       {
         path: 'measurement',
         name: 'Measurement',
         component: () => import('@/views/system/measurement'),
         meta: { title: '评价指标管理', icon: 'list', perms: ['measurement_manage'] }
+      },
+      {
+        path: 'dataset',
+        name: 'Dataset',
+        component: () => import('@/views/system/dataset'),
+        meta: { title: '数据集管理', icon: 'documentation', perms: ['dataset_manage'] }
+      },
+      {
+        path: 'task',
+        name: 'Task',
+        component: () => import('@/views/system/task'),
+        meta: { title: '任务管理', icon: 'documentation', perms: ['task_manage'] }
       }
     ]
   },

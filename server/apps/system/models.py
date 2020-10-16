@@ -210,7 +210,7 @@ class File(CommonAModel):
     """
     name = models.CharField('名称', max_length=300, null=True, blank=True)
     size = models.IntegerField('文件大小', default=1, null=True, blank=True)
-    file = models.FileField('文件', upload_to='%Y/%m/%d/')
+    file = models.FileField('文件', upload_to='')
     type_choices = (
         ('文档', '文档'),
         ('视频', '视频'),
@@ -240,3 +240,41 @@ class Measurement(BaseModel):
 
     def __str__(self):
         return self.name
+
+
+class Dataset(BaseModel):
+    '''
+    数据集
+    '''
+
+    dataset_name = models.CharField('数据集名称', max_length=50)
+    description = models.CharField('数据集详情', max_length=2000, null=True)
+    addr = models.CharField('数据集地址', max_length=500)
+
+    class Meta:
+        verbose_name = '数据集'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.dataset_name
+
+
+class Task(BaseModel):
+    '''
+    任务
+    '''
+
+    # status_type_choices = ((0, 0),(1, 1))
+    task_name = models.CharField('任务名称', max_length=100, unique=True)
+    task_type = models.CharField('任务类型', max_length=100)
+    matched_dataset = models.CharField('数据集', max_length=100)
+    description = models.TextField('描述', null=True)
+    task_status = models.IntegerField('任务状态', default=0)
+
+    # choices=status_type_choices
+    class Meta:
+        verbose_name = '任务'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.task_name
