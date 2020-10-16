@@ -73,15 +73,15 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息">
-        <el-table :data="tableData.filter(data => !search || data.task_name.toLowerCase().includes(search.toLowerCase()))">
-            <el-table-column property="task_name" label="任务名称" width="150"></el-table-column>
-            <el-table-column property="task_type" label="任务类型" width="150"></el-table-column>
-            <el-table-column property="create_time" label="创建日期" width="200"></el-table-column>
-            <el-table-column property="update_time" label="修改日期" width="200"></el-table-column>
-            <el-table-column property="matched_dataset" label="数据集" width="300"></el-table-column>
+    <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
+        <el-table :data="taskshowList" border> 
+            <el-table-column property="task_name" label="任务名称" width="120"></el-table-column>
+            <el-table-column property="task_type" label="任务类型" width="120"></el-table-column>
+            <el-table-column property="create_time" label="创建日期" width="180"></el-table-column>
+            <el-table-column property="update_time" label="修改日期" width="180"></el-table-column>
+            <el-table-column property="matched_dataset" label="数据集" width="120"></el-table-column>
             <el-table-column property="description" label="任务描述" width="200"></el-table-column>
-            <el-table-column property="task_status" label="任务状态" width="100"></el-table-column>
+            <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>
         </el-table>
     </el-dialog>
 
@@ -129,6 +129,16 @@ export default {
       search: '',
       tableData: [],
       taskList: [],
+      taskshowList: [{
+        id: '',
+        task_name: '',
+        task_type: '',
+        create_time: '',
+        update_time: '',
+        matched_dataset: '',
+        description: '',
+        task_status: ''
+      }],
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
@@ -162,11 +172,16 @@ export default {
       this.tableData = genTree(newData)
     },
 
-    handleShow(scope) {
-        //this.getList()
-        //this.task = Object.assign({},scope.row)
-        this.dialogTableVisible = true
-
+    handleShow(scope) {  
+      this.taskshowList[0].id = scope.row.id
+      this.taskshowList[0].task_name = scope.row.task_name
+      this.taskshowList[0].task_type = scope.row.task_type
+      this.taskshowList[0].create_time = scope.row.create_time
+      this.taskshowList[0].update_time = scope.row.update_time
+      this.taskshowList[0].matched_dataset = scope.row.matched_dataset
+      this.taskshowList[0].description = scope.row.description
+      this.taskshowList[0].task_status = scope.row.task_status
+      this.dialogTableVisible = true
     },
 
     handleAdd() {
