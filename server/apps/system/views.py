@@ -25,14 +25,15 @@ from utils.queryset import get_child_queryset2
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User)
+                     Role, User, App)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
                           PositionSerializer, RoleSerializer, TaskSerializer,
                           UserCreateSerializer, UserListSerializer,
-                          UserModifySerializer)
+                          UserModifySerializer,
+                          AppSerializer)
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -271,3 +272,16 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
         instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
         instance.path = settings.MEDIA_URL + instance.file.name
         instance.save()
+
+class AppViewSet(ModelViewSet):
+    """
+    App-增删改查
+    """
+    perms_map = {'get': '*', 'post': 'app_create',
+                 'put': 'app_update', 'delete': 'app_delete'}
+    queryset = App.objects.all()
+    serializer_class = AppSerializer
+    pagination_class = None
+    search_fields = ['name']
+    ordering_fields = ['pk']
+    ordering = ['pk']

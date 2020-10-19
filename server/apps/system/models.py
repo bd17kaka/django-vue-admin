@@ -5,8 +5,8 @@ from django.db.models.query import QuerySet
 
 from utils.model import SoftModel, BaseModel
 from simple_history.models import HistoricalRecords
-from django.contrib.postgres.fields import JSONField
-# from django_mysql.models import JSONField
+# from django.contrib.postgres.fields import JSONField
+from django_mysql.models import JSONField
 
 
 
@@ -224,6 +224,21 @@ class File(CommonAModel):
 
     class Meta:
         verbose_name = '文件库'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.name
+
+class App(SoftModel):
+    """
+    应用
+    """
+    name = models.CharField('应用名称', max_length=32, unique=True)
+    url = models.CharField('应用地址', max_length=1024)
+    description = models.CharField('描述', max_length=1024, blank=True, null=True)
+
+    class Meta:
+        verbose_name = '应用'
         verbose_name_plural = verbose_name
 
     def __str__(self):

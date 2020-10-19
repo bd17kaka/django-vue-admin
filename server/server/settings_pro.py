@@ -3,7 +3,7 @@ DEBUG = False
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aishare',
+        'NAME': 'qkl',
         'USER': 'root',
         'PASSWORD': '123',
         'HOST': '192.168.237.10',

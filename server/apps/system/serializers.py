@@ -4,7 +4,7 @@ from django_celery_beat.models import PeriodicTask
 from rest_framework import serializers
 
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User)
+                     Role, User, App)
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
@@ -139,3 +139,11 @@ class UserCreateSerializer(serializers.ModelSerializer):
         if User.objects.filter(phone=phone):
             raise serializers.ValidationError('手机号已经被注册')
         return phone
+
+class AppSerializer(serializers.ModelSerializer):
+    """
+    App序列化
+    """
+    class Meta:
+        model = App
+        fields = '__all__'
