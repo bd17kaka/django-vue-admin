@@ -16,5 +16,6 @@ router.register('measurement',MeasurementViewSet, basename="measurement")
 router.register('dataset', DatasetViewSet, basename="dataset")
 urlpatterns = [
     path('', include(router.urls)),
-    path('test/', TestView.as_view())
+    path('test/', TestView.as_view()),
+
 ]

@@ -284,7 +284,16 @@ class MeasurementViewSet(ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['sort']
     ordering = ['pk']
-
+    def perform_destroy(self, instance):
+        import os
+        print(instance.name)
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        print(current_dir)
+        parent_path = os.path.dirname(current_dir)
+        parent_path = os.path.dirname(parent_path)
+        print(parent_path)
+        os.remove(parent_path+'/media/'+instance.name+'.py')
+        instance.delete()
 
 class TaskViewSet(ModelViewSet):
     '''
