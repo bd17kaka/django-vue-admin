@@ -317,7 +317,7 @@ class DatasetViewSet(ModelViewSet):
                  'put': 'dataset_update', 'delete': 'dataset_delete'}
     queryset = Dataset.objects.all()
     serializer_class = DatasetSerializer
-    pagination_class = None
+    # pagination_class = None
     search_fields = ['dataset_name']
     ordering_fields = ['pk']
     ordering = ['pk']

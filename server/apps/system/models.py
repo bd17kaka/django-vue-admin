@@ -247,7 +247,7 @@ class Dataset(BaseModel):
     数据集
     '''
 
-    dataset_name = models.CharField('数据集名称', max_length=50)
+    dataset_name = models.CharField('数据集名称', max_length=50, unique=True)
     description = models.CharField('数据集详情', max_length=2000, null=True)
     addr = models.CharField('数据集地址', max_length=500)
 
