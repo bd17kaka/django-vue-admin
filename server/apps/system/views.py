@@ -25,14 +25,14 @@ from utils.queryset import get_child_queryset2
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User, Measurement, Task, Dataset, solution)
+                     Role, User, Measurement, Task, Dataset, solution, Tasktype)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
                           PositionSerializer, RoleSerializer, TaskSerializer,
                           UserCreateSerializer, UserListSerializer,
-                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, solutionSerializer)
+                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, solutionSerializer, TasktypeSerializer)
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -336,3 +336,16 @@ class solutionViewSet(ModelViewSet):
     search_fields = ['solutionId','solutionName', 'taskName']
     ordering_fields = ['pk']
     ordering=['pk']
+
+class TasktypeViewSet(ModelViewSet):
+    '''
+    任务类型-增删改查
+    '''
+    perms_map = {'get': '*', 'post': 'tasktype_create',
+                 'put': 'tasktype_update', 'delete': 'tasktype_delete'}
+    queryset = Tasktype.objects.all()
+    serializer_class = TasktypeSerializer
+    pagination_class = None
+    search_fields = ['tasktype_name','tasktype_description']
+    ordering_fields = ['pk']
+    ordering = ['pk']

@@ -74,7 +74,7 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
-        <el-table :data="taskshowList" border> 
+        <el-table :data="taskshowList" border>
             <el-table-column property="task_name" label="任务名称" width="120"></el-table-column>
             <el-table-column property="task_type" label="任务类型" width="120"></el-table-column>
             <el-table-column property="create_time" label="创建日期" width="180"></el-table-column>
@@ -93,8 +93,31 @@
         label-position="right"
         :rules="rule1"
       >
-        <el-form-item label="名称" prop="task_name">
-          <el-input v-model="task.task_name" placeholder="名称" />
+            <el-form-item label="任务名称" prop="task_name">
+          <el-input v-model="task.task_name" placeholder="任务名称" />
+        </el-form-item>
+        <el-form-item label="任务类型" prop="task_type">
+          <el-select v-model="task.task_type" placeholder="请选择任务类型" style="width:100%">
+           <el-option
+            v-for="item in tasktype"
+             :key="item.id"
+             :label="item.label"
+             :value="item.tasktype_name"
+           />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数据集" prop="mached_dataset">
+          <el-select v-model ="task.matched_dataset" placeholder="请选择数据集" style = "width:100%">
+            <el-option
+            v-for="item in dataset"
+            :key="item.id"
+            :label="item.label"
+            :value="item.dataset_name"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="任务描述" prop="description">
+          <el-input type = "textarea" autosize v-model="task.description" placeholder="任务描述" />
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -105,7 +128,21 @@
   </div>
 </template>
 
+        <!-- <el-form-item label="名称" prop="task_name">
+          <el-input v-model="task.task_name" placeholder="名称" />
+        </el-form-item>
+      </el-form>
+      <div style="text-align:right;">
+        <el-button type="danger" @click="dialogFormVisible=false">取消</el-button>
+        <el-button type="primary" @click="confirm('Form')">确认</el-button>
+      </div>
+    </el-dialog>
+  </div>
+</template> -->
+
 <script>
+import { getTasktypeAll } from "@/api/tasktype"
+import { getDatasetAll } from "@/api/dataset"
 import {
   getTaskAll,
   createTask,
@@ -129,6 +166,8 @@ export default {
       search: '',
       tableData: [],
       taskList: [],
+      tasktype: [],
+      dataset: [],
       taskshowList: [{
         id: '',
         task_name: '',
@@ -150,7 +189,9 @@ export default {
   },
   computed: {},
   created() {
-    this.getList()
+    this.getList();
+    this.getTasktypeAll()
+    this.getDatasetAll()
   },
   methods: {
     checkPermission,
@@ -165,6 +206,16 @@ export default {
     resetFilter() {
       this.getList()
     },
+    getTasktypeAll() {
+      getTasktypeAll().then(response => {
+        this.tasktype = genTree(response.data);
+      });
+    },
+    getDatasetAll() {
+      getDatasetAll().then(response => {
+        this.dataset = genTree(response.data);
+      });
+    },
     handleFilter() {       //搜索
       const newData = this.taskList.filter(
         data => !this.search || data.task_name.toLowerCase().includes(this.search.toLowerCase())
@@ -172,7 +223,7 @@ export default {
       this.tableData = genTree(newData)
     },
 
-    handleShow(scope) {  
+    handleShow(scope) {
       this.taskshowList[0].id = scope.row.id
       this.taskshowList[0].task_name = scope.row.task_name
       this.taskshowList[0].task_type = scope.row.task_type
@@ -237,6 +288,7 @@ export default {
               // this.tableData.unshift(this.task)
               this.getList()
               this.dialogFormVisible = false
+              console.log(this.task)
               this.$message({
                 message: '新增成功',
                 type: 'success',

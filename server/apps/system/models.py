@@ -292,3 +292,21 @@ class solution(BaseModel):
 
     def __str__(self):
         return self.solutionName
+
+
+class Tasktype(BaseModel):
+    '''
+    任务类型
+    '''
+
+    # status_type_choices = ((0, 0),(1, 1))
+    tasktype_name = models.CharField('任务类型名称', max_length=100, unique=True)
+    tasktype_description = models.TextField('描述')
+
+    # choices=status_type_choices
+    class Meta:
+        verbose_name = '任务类型'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.tasktype_name
