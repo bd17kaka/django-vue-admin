@@ -111,7 +111,7 @@ export default {
     },
     access(scope) {
       const app = deepClone(scope.row)
-      window.location.href = app.url
+      window.open(app.url, "_blank");
     },
     handleAdd() {
       this.app = Object.assign({}, defaultApp)
