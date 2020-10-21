@@ -30,4 +30,9 @@ export function deleteApp(id) {
   })
 }
 
-
+export function deleteLog() {
+  return request({
+    url: `/system/log/delete/`,
+    method: 'post'
+  })
+}

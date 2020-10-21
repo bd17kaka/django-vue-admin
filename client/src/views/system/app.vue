@@ -9,6 +9,7 @@
         @keyup.native="handleFilter"
       />
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增</el-button>
+      <el-button type="primary" icon="el-icon-delete-solid" @click="handleDeleteLog">清除30天日志</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -68,7 +69,8 @@ import {
   getAppAll,
   updateApp,
   createApp,
-  deleteApp
+  deleteApp,
+  deleteLog
 } from '@/api/app'
 
 const defaultApp = {
@@ -132,17 +134,34 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       })
-        .then(async() => {
-          await deleteApp(row.id)
-          this.tableData.splice($index, 1)
-          this.$message({
-            type: 'success',
-            message: '成功删除!'
-          })
+      .then(async() => {
+        await deleteApp(row.id)
+        this.tableData.splice($index, 1)
+        this.$message({
+          type: 'success',
+          message: '成功删除!'
         })
-        .catch(err => {
-          console.error(err)
+      })
+      .catch(err => {
+        console.error(err)
+      })
+    },
+    handleDeleteLog() {
+      this.$confirm('确认删除?', '警告', {
+        confirmButtonText: '确认',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+      .then(async() => {
+        await deleteLog()
+        this.$message({
+          type: 'success',
+          message: '删除任务提交成功!'
         })
+      })
+      .catch(err => {
+        console.error(err)
+      })
     },
     async confirmApp() {
       const isEdit = this.dialogType === 'edit'
