@@ -256,7 +256,7 @@ export default {
             updateMeasurement(this.measurement.id, this.measurement).then(() => {
               this.getList()
               this.$refs.upload.clearFiles()
-              this.dialogVisible = false
+              this.dialogTableVisible = false
               this.$message({
                 message: '编辑成功',
                 type: 'success',
@@ -270,7 +270,7 @@ export default {
               // this.tableData.unshift(this.measurement)
               this.getList()
               this.$refs.upload.clearFiles();
-              this.dialogVisible = false
+              this.dialogFormVisible = false
               this.$message({
                 message: '新增成功',
                 type: 'success',
