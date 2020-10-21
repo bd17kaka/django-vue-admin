@@ -1,4 +1,5 @@
 import logging
+import os
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
@@ -285,7 +286,6 @@ class MeasurementViewSet(ModelViewSet):
     ordering_fields = ['sort']
     ordering = ['pk']
     def perform_destroy(self, instance):
-        import os
         print(instance.name)
         current_dir = os.path.abspath(os.path.dirname(__file__))
         print(current_dir)
@@ -321,6 +321,13 @@ class DatasetViewSet(ModelViewSet):
     search_fields = ['dataset_name']
     ordering_fields = ['pk']
     ordering = ['pk']
+
+    def perform_destroy(self, instance):
+        current_dir = os.path.abspath(os.path.dirname(__file__))
+        parent_path = os.path.dirname(current_dir)
+        parent_path = os.path.dirname(parent_path)
+        os.remove(parent_path+'/media/'+instance.dataset_name+'.zip')
+        instance.delete()
 
 
 class solutionViewSet(ModelViewSet):

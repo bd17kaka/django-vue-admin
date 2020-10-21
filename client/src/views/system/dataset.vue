@@ -281,6 +281,7 @@ export default {
                 type: 'success',
               })
             })
+            this.$refs.upload.clearFiles()
           } else {
             this.dataset.addr = '/media/' + this.dataset.dataset_name
             createDataset(this.dataset).then(res => {
