@@ -278,3 +278,17 @@ class Task(BaseModel):
 
     def __str__(self):
         return self.task_name
+
+
+class solution(BaseModel):
+    solutionId=models.AutoField('ID',primary_key=True)
+    solutionName=models.CharField('方案名称',max_length=50)
+    codeAddr=models.CharField('代码地址',max_length=200)
+    taskName=models.CharField('所属任务',max_length=200)
+
+    class Meta:
+        verbose_name = '方案'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return self.solutionName

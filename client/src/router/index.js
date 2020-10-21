@@ -134,6 +134,12 @@ export const asyncRoutes = [
         name: 'Task',
         component: () => import('@/views/system/task'),
         meta: { title: '任务管理', icon: 'documentation', perms: ['task_manage'] }
+      },
+      {
+        path: 'solution',
+        name: 'solution',
+        component: () => import('@/views/system/solution'),
+        meta: { title: '方案管理', icon: 'list', perms: ['solution_manage'] }
       }
     ]
   },
