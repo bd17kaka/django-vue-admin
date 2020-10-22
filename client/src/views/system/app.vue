@@ -39,7 +39,7 @@
     </el-table>
 
     <el-dialog :visible.sync="dialogVisible" :title="dialogType==='edit'?'编辑App':'新增App'">
-      <el-form :model="role" label-width="80px" label-position="left">
+      <el-form :model="app" label-width="80px" label-position="left">
         <el-form-item label="名称">
           <el-input v-model="app.name" placeholder="名称" />
         </el-form-item>

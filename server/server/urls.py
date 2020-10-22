@@ -32,6 +32,7 @@ urlpatterns = [
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('token/black/', LogoutView.as_view(), name='token_black'),
     path('system/', include('apps.system.urls')),
+    path('fabric/', include('apps.fabric.urls')),
     path('docs/', include_docs_urls(title="接口文档",
                                     authentication_classes=[], permission_classes=[])),
     path('', include(router.urls)),

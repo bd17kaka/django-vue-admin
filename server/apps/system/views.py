@@ -39,6 +39,8 @@ import requests as rq
 import json 
 import _thread
 
+from django.conf import settings
+
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
 # logger.error('请求出错-{}'.format(error))
@@ -296,7 +298,7 @@ class LogView(ModelViewSet):
     def delete(self, request):
         def delete_task():
             values = {"query": {"range": {"@timestamp": {"lt": "now-1d","format": "epoch_millis"}}}}
-            url = 'http://192.168.237.10:9200/metricbeat-*/_delete_by_query'
+            url = settings.ES_URL + '/metricbeat-*/_delete_by_query'
             headers = {
                 'User-Agent': 'Mozilla/4.0 (compatible; MSIE 5.5; Windows NT)',
                 'Content-Type': 'application/json;charset=UTF-8'
@@ -306,3 +308,4 @@ class LogView(ModelViewSet):
             traget = res.json()
         _thread.start_new_thread(delete_task, ())
         return Response('数据清除任务提交成功', status=status.HTTP_200_OK)
+

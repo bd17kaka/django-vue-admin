@@ -261,3 +261,7 @@ LOGGING = {
         },
     }
 }
+
+
+ES_URL = 'http://192.168.237.10:9200'
+FABRIC_URL_PREFIX = 'http://192.168.237.10:4000'

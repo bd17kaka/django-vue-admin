@@ -125,6 +125,28 @@ export const asyncRoutes = [
       },
     ]
   },
+  
+  {
+    path: '/fabric',
+    component: Layout,
+    // redirect: '/fabric/perm',
+    name: 'Fabric',
+    meta: { title: 'Fabric', icon: 'example', perms: ['fabric_manage'] },
+    children: [
+      {
+        path: 'channel',
+        name: 'Channel',
+        component: () => import('@/views/fabric/channel'),
+        meta: { title: 'Channel管理', icon: 'lock', perms: ['channel_manage'] }
+      },
+      {
+        path: 'chaincode',
+        name: 'Chaincode',
+        component: () => import('@/views/fabric/chaincode'),
+        meta: { title: '合约管理', icon: 'lock', perms: ['chaincode_manage'] }
+      },
+    ]
+  },
   {
     path: '/develop',
     component: Layout,

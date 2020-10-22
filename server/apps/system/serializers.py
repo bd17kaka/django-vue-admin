@@ -147,3 +147,4 @@ class AppSerializer(serializers.ModelSerializer):
     class Meta:
         model = App
         fields = '__all__'
+        
