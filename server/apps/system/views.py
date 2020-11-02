@@ -352,7 +352,7 @@ class TasktypeViewSet(ModelViewSet):
                  'put': 'tasktype_update', 'delete': 'tasktype_delete'}
     queryset = Tasktype.objects.all()
     serializer_class = TasktypeSerializer
-    pagination_class = None
+#   pagination_class = None
     search_fields = ['tasktype_name','tasktype_description']
     ordering_fields = ['pk']
     ordering = ['pk']

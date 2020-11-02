@@ -113,6 +113,16 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="评价指标" prop="task_measurement">
+          <el-select v-model ="task.task_measurement" placeholder="请选择评价指标" style = "width:100%">
+            <el-option
+            v-for="item in measurement"
+            :key="item.id"
+            :label="item.label"
+            :value="item.name"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item label="任务描述" prop="description">
           <el-input type = "textarea" autosize v-model="task.description" placeholder="任务描述" />
         </el-form-item>
@@ -135,6 +145,7 @@
 <script>
 import { getTasktypeAll } from "@/api/tasktype"
 import { getDatasetAll } from "@/api/dataset"
+import {getMeasurementAll} from"@/api/measurement"
 import {
   getTaskList,
   getTaskAll,
@@ -167,6 +178,7 @@ export default {
       },
       tasktype: [],
       dataset: [],
+      measurement: [],
       taskshowList: [{
         id: '',
         task_name: '',
@@ -193,6 +205,7 @@ export default {
     this.getList();
     this.getTasktypeAll()
     this.getDatasetAll()
+    this.getMeasurementAll()
   },
   methods: {
     checkPermission,
@@ -200,8 +213,7 @@ export default {
       this.listLoading = true;
       getTaskList(this.listQuery).then(response => {
         if (response.data) {
-          this.taskList = response.data
-        }
+          this.taskList = response.data        }
         this.listLoading = false;
       });
     },
@@ -218,13 +230,17 @@ export default {
     },
     getTasktypeAll() {
       getTasktypeAll().then(response => {
-        this.tasktype = genTree(response.data);
+        this.tasktype = genTree(response.data.results);
       });
     },
     getDatasetAll() {
       getDatasetAll().then(response => {
         this.dataset = genTree(response.data.results);
-        console.log(response.data)
+      });
+    },
+    getMeasurementAll() {
+      getMeasurementAll().then(response => {
+        this.measurement = genTree(response.data);
       });
     },
     handleShow(scope) {

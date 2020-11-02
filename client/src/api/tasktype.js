@@ -1,5 +1,13 @@
 import request from '@/utils/request'
 
+export function getTasktypeList(query) {
+  return request({
+    url: '/system/tasktype/',
+    method: 'get',
+    params: query
+  })
+}
+
 export function getTasktypeAll() {
   return request({
     url: '/system/tasktype/',

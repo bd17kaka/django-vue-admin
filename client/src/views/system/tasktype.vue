@@ -13,7 +13,7 @@
 
   <el-table
       v-loading="listLoading"
-      :data="tableData.filter(data => !search || data.tasktype_name.toLowerCase().includes(search.toLowerCase()))"
+      :data="tasktypeList.results"
       style="width: 100%;margin-top:10px;"
       border
       fit
@@ -89,6 +89,13 @@
         <el-button type="primary" @click="confirm('Form')">确认</el-button>
       </div>
     </el-dialog>
+    <pagination
+      v-show="tasktypeList.count>0"
+      :total="tasktypeList.count"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.page_size"
+      @pagination="getList"
+    />
   </div>
 </template>
 
@@ -97,16 +104,19 @@ import {
   getTasktypeAll,
   createTasktype,
   deleteTasktype,
-  updateTasktype
+  updateTasktype,
+  getTasktypeList,
 } from '@/api/tasktype'
 import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
+import Pagination from "@/components/Pagination"
 
 const defaultM = {
   id: '',
   tasktype: ''
 }
 export default {
+  components: { Pagination },
   data() {
     return {
       tasktype: {
@@ -115,7 +125,11 @@ export default {
       },
       search: '',
       tableData: [],
-      tasktypeList: [],
+      tasktypeList: {count:0},
+      listQuery: {
+        page: 1,
+        page_size: 20
+      },
       present_row: [{
         tasktype_name: "",
         tasktype_description: "",
@@ -140,24 +154,24 @@ export default {
   methods: {
     checkPermission,
     getList() {
-      this.listLoading = true
-      getTasktypeAll().then(response => {
-        this.tasktypeList = response.data
-        this.tableData = response.data
-        this.listLoading = false
-      })
-      
+      this.listLoading = true;
+      getTasktypeList(this.listQuery).then(response => {
+        if (response.data) {
+          this.tasktypeList = response.data
+                  }
+        this.listLoading = false;
+      });
     },
     resetFilter() {
-      this.getList()
+      this.listQuery = {
+        page: 1,
+        page_size: 20
+      };
+      this.getList();
     },
-    handleFilter() {       //搜索
-      const newData = this.tasktypeList.filter(
-        data =>
-          !this.search ||
-          data.tasktype_name.toLowerCase().includes(this.search.toLowerCase())
-      )
-      this.tableData = genTree(newData)
+    handleFilter() {
+      this.listQuery.page = 1;
+      this.getList();
     },
 
     checkDetail(row){        //查看详情
