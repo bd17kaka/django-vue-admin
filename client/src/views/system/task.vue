@@ -1,18 +1,15 @@
 <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input
-        v-model="search"
-        placeholder="输入任务名称进行搜索"
-        style="width: 200px;"
-        class="filter-item"
-      />
-      <el-button type="primary" icon="el-icon-search" @click="handleFilter" >搜索</el-button>
+      <el-input v-model="listQuery.search" placeholder="请输入任务名称进行搜索" 
+        style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增任务</el-button>
     </div>
     <el-table
       v-loading="listLoading"
-      :data="tableData"
+      :data="taskList.results"
       style="width: 100%;margin-top:10px;"
       border
       fit
@@ -48,7 +45,7 @@
           <el-button
             type="info"
             size="small"
-            icon="el-icon-message"
+            icon="el-icon-view"
             :disabled="!checkPermission(['task_query'])"
             @click="handleShow(scope)"
             title="查看详细信息"
@@ -85,7 +82,7 @@
         </el-table>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑岗位':'新增岗位'">
+    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑任务':'新增任务'">
       <el-form
         ref="Form"
         :model="task"
@@ -125,25 +122,21 @@
         <el-button type="primary" @click="confirm('Form')">确认</el-button>
       </div>
     </el-dialog>
+    <pagination
+      v-show="taskList.count>0"
+      :total="taskList.count"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.page_size"
+      @pagination="getList"
+    />
   </div>
 </template>
-
-        <!-- <el-form-item label="名称" prop="task_name">
-          <el-input v-model="task.task_name" placeholder="名称" />
-        </el-form-item>
-      </el-form>
-      <div style="text-align:right;">
-        <el-button type="danger" @click="dialogFormVisible=false">取消</el-button>
-        <el-button type="primary" @click="confirm('Form')">确认</el-button>
-      </div>
-    </el-dialog>
-  </div>
-</template> -->
 
 <script>
 import { getTasktypeAll } from "@/api/tasktype"
 import { getDatasetAll } from "@/api/dataset"
 import {
+  getTaskList,
   getTaskAll,
   createTask,
   deleteTask,
@@ -151,12 +144,14 @@ import {
 } from '@/api/task'
 import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
+import Pagination from "@/components/Pagination"
 
 const defaultM = {
   id: '',
   task_name: ''
 }
 export default {
+  components: { Pagination },
   data() {
     return {
       task: {
@@ -165,7 +160,11 @@ export default {
       },
       search: '',
       tableData: [],
-      taskList: [],
+      taskList:  {count:0},
+      listQuery: {
+        page: 1,
+        page_size: 20
+      },
       tasktype: [],
       dataset: [],
       taskshowList: [{
@@ -183,8 +182,10 @@ export default {
       dialogTableVisible: false,
       dialogType: 'new',
       rule1: {
-        task_name: [{ required: true, message: '请输入名称', trigger: 'blur' }]
-      }
+        task_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
+        task_type: [{ required: true, message: '请选择任务类型', trigger: 'blur' }],
+        matched_dataset: [{ required: true, message: '请选择数据集', trigger: 'blur' }]
+      },
     }
   },
   computed: {},
@@ -196,15 +197,24 @@ export default {
   methods: {
     checkPermission,
     getList() {
-      this.listLoading = true
-      getTaskAll().then(response => {
-        this.taskList = response.data
-        this.tableData = response.data
-        this.listLoading = false
-      })
+      this.listLoading = true;
+      getTaskList(this.listQuery).then(response => {
+        if (response.data) {
+          this.taskList = response.data
+        }
+        this.listLoading = false;
+      });
     },
     resetFilter() {
-      this.getList()
+      this.listQuery = {
+        page: 1,
+        page_size: 20
+      };
+      this.getList();
+    },
+    handleFilter() {
+      this.listQuery.page = 1;
+      this.getList();
     },
     getTasktypeAll() {
       getTasktypeAll().then(response => {
@@ -213,16 +223,10 @@ export default {
     },
     getDatasetAll() {
       getDatasetAll().then(response => {
-        this.dataset = genTree(response.data);
+        this.dataset = genTree(response.data.results);
+        console.log(response.data)
       });
     },
-    handleFilter() {       //搜索
-      const newData = this.taskList.filter(
-        data => !this.search || data.task_name.toLowerCase().includes(this.search.toLowerCase())
-      )
-      this.tableData = genTree(newData)
-    },
-
     handleShow(scope) {
       this.taskshowList[0].id = scope.row.id
       this.taskshowList[0].task_name = scope.row.task_name

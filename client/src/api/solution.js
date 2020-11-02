@@ -14,13 +14,13 @@ export function getSolutionAll() {
   })
 }
 
-// export function getSolutionList() {
-//   return request({
-//     url: '/system/solution/',
-//     method: 'get',
-//     // params: query
-//   })
-// }
+export function getSolutionList(query) {
+  return request({
+    url: '/system/solution/',
+    method: 'get',
+    params: query
+  })
+}
 
 // export function getSolution(id) {
 //   return request({

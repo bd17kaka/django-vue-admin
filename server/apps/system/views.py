@@ -303,7 +303,7 @@ class TaskViewSet(ModelViewSet):
                  'put': 'task_update', 'delete': 'task_delete'}
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    pagination_class = None
+    # pagination_class = None
     search_fields = ['task_name','description']
     ordering_fields = ['pk']
     ordering = ['pk']
@@ -338,7 +338,7 @@ class solutionViewSet(ModelViewSet):
                  'put': 'solutionUpdate', 'delete': 'solutionDelete'}
     queryset = solution.objects.all()
     serializer_class = solutionSerializer
-    pagination_class = None
+    # pagination_class = None
     # filterset_class = UserFilter
     search_fields = ['solutionId','solutionName', 'taskName']
     ordering_fields = ['pk']

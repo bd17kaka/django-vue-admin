@@ -1,18 +1,15 @@
 <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input
-        v-model="search"
-        placeholder="输入方案名称进行搜索"
-        style="width: 200px;"
-        class="filter-item"
-        @keyup.native="handleFilter"
-      />
+      <el-input v-model="listQuery.search" placeholder="请输入方案名称进行搜索" 
+        style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
+      <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增方案</el-button>
     </div>
     <el-table
       v-loading="listLoading"
-      :data="tableData.filter(data => !search || data.solutionName.toLowerCase().includes(search.toLowerCase()))"
+      :data="solutionList.results"
       style="width: 100%;margin-top:10px;"
       border
       fit
@@ -30,18 +27,6 @@
       <el-table-column label="任务名称">
         <template slot-scope="scope">{{ scope.row.taskName }}</template>
       </el-table-column>
-
-<!--      <el-table-column label="创建日期">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ scope.row.create_time }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
-
-<!--      <el-table-column label="任务描述">-->
-<!--        <template slot-scope="scope">-->
-<!--          <span>{{ scope.row.description }}</span>-->
-<!--        </template>-->
-<!--      </el-table-column>-->
 
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
@@ -87,7 +72,7 @@
         </el-table>
     </el-dialog>
 
-    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑岗位':'新增方案'">
+    <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑方案':'新增方案'">
       <el-form
         ref="Form"
         :model="solution"
@@ -98,12 +83,16 @@
         <el-form-item label="方案名称" prop="solutionName">
           <el-input v-model="solution.solutionName" placeholder="方案名称" />
         </el-form-item>
-<!--        <el-form-item label="任务名称" prop="taskName">-->
-<!--          <el-input v-model="solution.taskName" placeholder="所属名称" />-->
-<!--        </el-form-item>-->
         <el-form-item label="任务名称" prop="taskName">
-          <select v-model="solution.taskName">
-            <option v-for="x in taskList">{{x.task_name}}</option>
+
+          <el-select v-model="solution.taskName" placeholder="请选择任务名称" style="width:100%">
+           <el-option
+            v-for="item in taskList"
+             :key="item.id"
+             :label="item.label"
+             :value="item.task_name"
+           />
+          </el-select>
           </select>
         </el-form-item>
 
@@ -130,11 +119,19 @@
         <el-button type="primary" @click="confirm('Form')">确认</el-button>
       </div>
     </el-dialog>
+    <pagination
+      v-show="solutionList.count>0"
+      :total="solutionList.count"
+      :page.sync="listQuery.page"
+      :limit.sync="listQuery.page_size"
+      @pagination="getList"
+    />
   </div>
 </template>
 
 <script>
 import {
+  getSolutionList,
   getSolutionAll,
   createSolution,
   deleteSolution,
@@ -144,12 +141,14 @@ import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
 import {getTaskAll} from "@/api/task";
 import {upHeaders, upUrl} from "@/api/file";
+import Pagination from "@/components/Pagination"
 
 const defaultM = {
   id: '',
   solutionName: ''
 }
 export default {
+  components: { Pagination },
   data() {
     return {
       upHeaders: upHeaders(),
@@ -162,7 +161,11 @@ export default {
       },
       search: '',
       tableData: [],
-      solutionList: [],
+      solutionList: {count:0},
+      listQuery: {
+        page: 1,
+        page_size: 20
+      },
       taskList:[],
       listLoading: true,
       dialogFormVisible: false,
@@ -176,6 +179,7 @@ export default {
   computed: {},
   created() {
     this.getList()
+    this.getTaskAll()
   },
   methods: {
     checkPermission,
@@ -189,34 +193,35 @@ export default {
       }
       return notNull;
     },
-    getList() {
-      this.listLoading = true
-      getSolutionAll().then(response => {
-        this.solutionList = response.data
-        this.tableData = response.data
-        this.listLoading = false
-      })
+    getTaskAll() {
       getTaskAll().then(response => {
-        this.taskList = response.data
-      })
+        this.taskList = genTree(response.data.results);
+      });
+    },
+    getList() {
+      this.listLoading = true;
+      getSolutionList(this.listQuery).then(response => {
+        if (response.data) {
+          this.solutionList = response.data
+        }
+        this.listLoading = false;
+      });
     },
     resetFilter() {
-      this.getList()
+      this.listQuery = {
+        page: 1,
+        page_size: 20
+      };
+      this.getList();
     },
-    handleFilter() {       //搜索
-      const newData = this.solutionList.filter(
-        data =>
-          !this.search ||
-          data.solutionName.toLowerCase().includes(this.search.toLowerCase())
-      )
-      this.tableData = genTree(newData)
+    handleFilter() {
+      this.listQuery.page = 1;
+      this.getList();
     },
 
     handleShow(scope) {
         this.dialogTableVisible = true
-
     },
-
     handleAdd() {
       this.solution = Object.assign({}, defaultM)
       this.dialogType = 'new'

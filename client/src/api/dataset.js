@@ -9,6 +9,13 @@ export function getDatasetList(query) {
   })
 }
 
+export function getDatasetAll() {
+  return request({
+    url: '/system/dataset/',
+    method: 'get',
+  })
+}
+
 export function createDataset(data) {         
   return request({
     url: '/system/dataset/',
