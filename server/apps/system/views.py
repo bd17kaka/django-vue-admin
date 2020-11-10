@@ -1,5 +1,6 @@
 import logging
 import os
+import pandas as pd
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
@@ -191,18 +192,46 @@ class UserViewSet(ModelViewSet):
         return UserModifySerializer
 
     def create(self, request, *args, **kwargs):
-        # 创建用户默认添加密码
-        password = request.data['password'] if 'password' in request.data else None
-        if password:
-            password = make_password(password)
+        #print(request.data)
+        #print(request.data['file'])
+        if(request.data['file'] == None):
+            # 创建用户默认添加密码
+            password = request.data['password'] if 'password' in request.data else None
+            if password:
+                password = make_password(password)
+            else:
+                password = make_password('0000')
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            instance = serializer.save(password=password)
+            # from apps.employee.models import Employee
+            # Employee.objects.create(user=instance,create_by=request.user)
+            return Response(serializer.data)
+        
         else:
-            password = make_password('0000')
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
-        instance = serializer.save(password=password)
-        # from apps.employee.models import Employee
-        # Employee.objects.create(user=instance,create_by=request.user)
-        return Response(serializer.data)
+            current_dir = os.path.abspath(os.path.dirname(__file__))
+            parent_path = os.path.dirname(current_dir)
+            parent_path = os.path.dirname(parent_path)
+            path = parent_path + '/media/' + request.data['file']
+            allData = pd.read_excel(path)
+            Number = allData["学号"]
+            Name = allData["姓名"]
+            for number,name in zip(Number,Name):
+                tempDict={}
+                tempDict["id"]=''
+                tempDict["name"]=name
+                tempDict["username"]=number
+                tempDict["dept"]=None
+                tempDict["avatar"]='/media/default/avatar.png'
+                #print(tempDict)
+                password = make_password('0000')
+                serializer = self.get_serializer(data = tempDict)
+                serializer.is_valid(raise_exception=True)
+                instance = serializer.save(password=password)
+                # from apps.employee.models import Employee
+                # Employee.objects.create(user=instance,create_by=request.user)
+            return Response('批量新增成功', status=status.HTTP_200_OK)
+        
 
     @action(methods=['put'], detail=False, permission_classes=[IsAuthenticated], # perms_map={'put':'change_password'}
             url_name='change_password')

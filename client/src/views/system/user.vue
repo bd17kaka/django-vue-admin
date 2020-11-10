@@ -58,6 +58,7 @@
         </div>
         <div style="margin-top:10px">
           <el-button type="primary" icon="el-icon-plus" @click="handleAddUser">新增</el-button>
+          <el-button type="primary" icon="el-icon-plus" @click="handleBatchAddUser">批量新增</el-button>
         </div>
         <el-table
           v-loading="listLoading"
@@ -160,6 +161,31 @@
         <el-button type="primary" @click="confirm('Form')">确认</el-button>
       </div>
     </el-dialog>
+    <el-dialog :visible.sync="dialogVisible2" :title="批量新增用户">
+      <el-form
+        ref="Form2"
+        label-width="100px"
+        label-position="right"
+      >
+        <el-form-item label="上传用户信息">
+          <el-upload
+            ref="upload"
+            class="upload-demo"
+            :action="upUrl"
+            :before-upload="beforeUpload"
+            :headers="upHeaders"
+            :on-success="UploadSuccess"
+          >
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传excel文件</div>
+          </el-upload>
+        </el-form-item>
+      <div style="text-align:right;">
+        <el-button type="danger" @click="dialogVisible2=false">取消</el-button>
+        <el-button type="primary" @click="confirm2('Form2')">确认</el-button>
+      </div>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 <style>
@@ -197,12 +223,14 @@ import { upUrl, upHeaders } from "@/api/file"
 import Pagination from "@/components/Pagination" // secondary package based on el-pagination
 import Treeselect from '@riophae/vue-treeselect'
 import '@riophae/vue-treeselect/dist/vue-treeselect.css'
+import {createMeasurement, updateMeasurement} from "@/api/measurement";
 const defaultUser = {
   id: "",
   name: "",
   username: "",
   dept: null,
-  avatar: "/media/default/avatar.png"
+  avatar: "/media/default/avatar.png",
+  file: null
 };
 export default {
   components: { Pagination, Treeselect },
@@ -223,6 +251,7 @@ export default {
         { key: "false", display_name: "禁用" }
       ],
       dialogVisible: false,
+      dialogVisible2: false,
       dialogType: "new",
       rule1: {
         name: [{ required: true, message: "请输入姓名", trigger: "blur" }],
@@ -250,7 +279,7 @@ export default {
   methods: {
     checkPermission,
     handleAvatarSuccess(res, file) {
-        this.user.avatar = res.data.path
+      this.user.avatar = res.data.path
     },
     beforeAvatarUpload(file) {
       const isLt2M = file.size / 1024 / 1024 < 2;
@@ -300,12 +329,35 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
+    UploadSuccess(res, file) {
+      var str = res.data.name;
+    },
+    beforeUpload(file) {
+      const isZip = file.name.endsWith('.xlsx') || file.name.endsWith('.xls');
+      if (!isZip) {
+        this.$message.error('请选择excel文件！');
+        return false;
+      }
+      else
+        this.user.file = file.name;
+        return true;
+    },
     handleAddUser() {
       this.user = Object.assign({}, defaultUser);
       this.dialogType = "new";
       this.dialogVisible = true;
+      this.file = true;
       this.$nextTick(() => {
         this.$refs["Form"].clearValidate();
+      });
+    },
+    handleBatchAddUser() {
+      this.user = Object.assign({}, defaultUser);
+      this.dialogType = "new";
+      this.dialogVisible2 = true;
+      this.defaultUser.file = 1;
+      this.$nextTick(() => {
+        this.$refs["Form2"].clearValidate();
       });
     },
     handleEdit(scope) {
@@ -324,7 +376,7 @@ export default {
       })
         .then(async () => {
           await deleteUser(scope.row.id);
-          this.userList.splice(scope.row.index, 1);
+          this.getList();
           this.$message({
             type: "success",
             message: "成功删除!"
@@ -340,28 +392,40 @@ export default {
           const isEdit = this.dialogType === "edit";
           if (isEdit) {
             updateUser(this.user.id, this.user).then(res => {
-                this.getList();
-                this.dialogVisible = false;
-                this.$message({
-                  message: "编辑成功",
-                  type: "success",
-                });
+              this.getList();
+              this.dialogVisible = false;
+              this.$message({
+                message: "编辑成功",
+                type: "success",
+              });
             });
           } else {
             createUser(this.user).then(res => {
-                this.getList();
-                this.dialogVisible = false;
-                this.$message({
-                  message: "新增成功",
-                  type: "success"
-                });
+              this.getList();
+              this.dialogVisible = false;
+              this.$message({
+                message: "新增成功",
+                type: "success"
+              });
             });
           }
         } else {
           return false;
         }
       });
+    },
+    async confirm2(form) {
+      this.$refs.upload.clearFiles();
+      createUser(this.user).then(res => {
+        this.getList();
+        this.dialogVisible2 = false;
+        this.$message({
+          message: "新增成功",
+          type: "success"
+        });
+      });
     }
   }
-};
+}
+
 </script>
