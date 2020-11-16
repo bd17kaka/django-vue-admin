@@ -267,6 +267,7 @@ class Task(BaseModel):
     # status_type_choices = ((0, 0),(1, 1))
     task_name = models.CharField('任务名称', max_length=100, unique=True)
     task_type = models.CharField('任务类型', max_length=100)
+    task_measurement = models.CharField('评价指标', max_length=100)
     matched_dataset = models.CharField('数据集', max_length=100)
     description = models.TextField('描述', null=True)
     task_status = models.IntegerField('任务状态', default=0)

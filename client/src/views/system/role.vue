@@ -17,16 +17,15 @@
       style="width: 100%;margin-top:10px;"
       border
     >
-      <!-- <el-table-column align="center" label="Role Key" width="220">
-        <template slot-scope="scope">
-          {{ scope.row.id }}
-        </template>
-      </el-table-column>-->
+
       <el-table-column align="center" label="角色名称" width="220">
         <template slot-scope="scope">{{ scope.row.name }}</template>
       </el-table-column>
       <el-table-column align="header-center" label="角色描述">
         <template slot-scope="scope">{{ scope.row.description }}</template>
+      </el-table-column>
+      <el-table-column align="center" label="角色id（批量注册时用）" width="180">
+        <template slot-scope="scope">{{ scope.row.id }}</template>
       </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">

@@ -32,6 +32,9 @@
           <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
+      <el-table-column align="center" label="部门id（批量注册时用）" width="175">
+       <template slot-scope="scope">{{ scope.row.id }}</template>
+      </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button
@@ -100,7 +103,7 @@ export default {
       dialogType: 'new',
       rule1: {
         name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        parent: [{ required: true, message: '请选择上级', trigger: 'change' }]
+        parent: [{ required: false, message: '请选择上级', trigger: 'change' }]
       }
     }
   },

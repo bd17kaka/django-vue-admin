@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input v-model="listQuery.search" placeholder="请输入任务名称进行搜索" 
+      <el-input v-model="listQuery.search" placeholder="请输入任务名称进行搜索"
         style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
@@ -77,6 +77,7 @@
             <el-table-column property="create_time" label="创建日期" width="180"></el-table-column>
             <el-table-column property="update_time" label="修改日期" width="180"></el-table-column>
             <el-table-column property="matched_dataset" label="数据集" width="120"></el-table-column>
+            <el-table-column property="task_measurement" label="评价指标" width="120"></el-table-column>
             <el-table-column property="description" label="任务描述" width="200"></el-table-column>
             <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>
         </el-table>
@@ -103,7 +104,7 @@
            />
           </el-select>
         </el-form-item>
-        <el-form-item label="数据集" prop="mached_dataset">
+        <el-form-item label="数据集" prop="matched_dataset">
           <el-select v-model ="task.matched_dataset" placeholder="请选择数据集" style = "width:100%">
             <el-option
             v-for="item in dataset"
@@ -186,6 +187,7 @@ export default {
         create_time: '',
         update_time: '',
         matched_dataset: '',
+        task_measurement: '',
         description: '',
         task_status: ''
       }],
@@ -196,7 +198,8 @@ export default {
       rule1: {
         task_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
         task_type: [{ required: true, message: '请选择任务类型', trigger: 'blur' }],
-        matched_dataset: [{ required: true, message: '请选择数据集', trigger: 'blur' }]
+        matched_dataset: [{ required: true, message: '请选择数据集', trigger: 'blur' }],
+        task_measurement: [{ required: true, message: '请选择评价指标', trigger: 'blur' }],
       },
     }
   },

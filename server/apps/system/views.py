@@ -216,14 +216,17 @@ class UserViewSet(ModelViewSet):
             allData = pd.read_excel(path)
             Number = allData["学号"]
             Name = allData["姓名"]
-            for number,name in zip(Number,Name):
+            Dept = allData["部门"]
+            Role = allData["角色"]
+            for number,name,dept,role in zip(Number,Name,Dept,Role):
                 tempDict={}
                 tempDict["id"]=''
                 tempDict["name"]=name
                 tempDict["username"]=number
                 tempDict["dept"]=None
                 tempDict["avatar"]='/media/default/avatar.png'
-                #print(tempDict)
+                tempDict["dept"]=dept
+                tempDict["roles"]=[role]
                 password = make_password('0000')
                 serializer = self.get_serializer(data = tempDict)
                 serializer.is_valid(raise_exception=True)
@@ -315,12 +318,12 @@ class MeasurementViewSet(ModelViewSet):
     ordering_fields = ['sort']
     ordering = ['pk']
     def perform_destroy(self, instance):
-        print(instance.name)
+        #print(instance.name)
         current_dir = os.path.abspath(os.path.dirname(__file__))
-        print(current_dir)
+        #print(current_dir)
         parent_path = os.path.dirname(current_dir)
         parent_path = os.path.dirname(parent_path)
-        print(parent_path)
+        #print(parent_path)
         os.remove(parent_path+'/media/'+instance.name+'.py')
         instance.delete()
 
