@@ -180,6 +180,19 @@
           <div slot="tip" class="el-upload__tip">只能上传excel文件</div>
           </el-upload>
         </el-form-item>
+        <el-form-item label="所属部门" prop="dept">
+          <treeselect v-model="user.dept" :multiple="false" :options="orgData" placeholder="所属部门"/>
+        </el-form-item>
+        <el-form-item label="角色" prop="roles">
+         <el-select v-model="user.roles" multiple placeholder="请选择角色" style="width:100%">
+          <el-option
+            v-for="item in roles"
+            :key="item.value"
+            :label="item.label"
+            :value="item.value"
+          />
+          </el-select>
+        </el-form-item>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogVisible2=false">取消</el-button>
         <el-button type="primary" @click="confirm2('Form2')">确认</el-button>

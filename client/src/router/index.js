@@ -99,12 +99,12 @@ export const asyncRoutes = [
         component: () => import('@/views/system/position'),
         meta: { title: '岗位管理', icon: 'position', perms: ['position_manage'] }
       },
-      {
-        path: 'dict',
-        name: 'Dict',
-        component: () => import('@/views/system/dict'),
-        meta: { title: '数据字典', icon: 'example', perms: ['dict_manage'] }
-      },
+      // {
+      //   path: 'dict',
+      //   name: 'Dict',
+      //   component: () => import('@/views/system/dict'),
+      //   meta: { title: '数据字典', icon: 'example', perms: ['dict_manage'] }
+      // },
       {
         path: 'file',
         name: 'File',
@@ -162,16 +162,16 @@ export const asyncRoutes = [
         component: () => import('@/views/system/perm'),
         meta: { title: '权限菜单', icon: 'example', perms: ['perm_manage'] }
       },
-      {
-        path: 'form-gen-link',
-        component: Layout,
-        children: [
-          {
-            path: 'https://jakhuang.github.io/form-generator/',
-            meta: { title: '表单设计器', icon: 'link', perms: ['dev_form_gen'] }
-          }
-        ]
-      },
+      // {
+      //   path: 'form-gen-link',
+      //   component: Layout,
+      //   children: [
+      //     {
+      //       path: 'https://jakhuang.github.io/form-generator/',
+      //       meta: { title: '表单设计器', icon: 'link', perms: ['dev_form_gen'] }
+      //     }
+      //   ]
+      // },
       {
         path: 'docs-link',
         component: Layout,

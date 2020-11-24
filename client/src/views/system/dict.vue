@@ -7,7 +7,7 @@
     <span>字典类型</span>
     <el-button v-if="checkPermission(['dicttype_add'])" style="float: right; padding: 3px 0" type="text" icon="el-icon-plus" @click="handleAddDictType" >新增</el-button>
   </div>
-        
+
         <el-tree
           ref="tree"
           v-loading="treeLoding"
@@ -74,7 +74,7 @@
           </el-table-column>
           <el-table-column label="是否有效">
             <template slot-scope="scope">
-              
+
               <el-tag type="success" v-if="scope.row.is_used">有效</el-tag>
               <el-tag type="danger" v-else>无效</el-tag>
               </template>

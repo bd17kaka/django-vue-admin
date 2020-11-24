@@ -192,7 +192,7 @@ class UserViewSet(ModelViewSet):
         return UserModifySerializer
 
     def create(self, request, *args, **kwargs):
-        #print(request.data)
+        print(request.data)
         #print(request.data['file'])
         if(request.data['file'] == None):
             # 创建用户默认添加密码
@@ -216,17 +216,20 @@ class UserViewSet(ModelViewSet):
             allData = pd.read_excel(path)
             Number = allData["学号"]
             Name = allData["姓名"]
-            Dept = allData["部门"]
-            Role = allData["角色"]
-            for number,name,dept,role in zip(Number,Name,Dept,Role):
+            #Dept = allData["部门"]
+            #Role = allData["角色"]
+            for number,name in zip(Number,Name):
                 tempDict={}
                 tempDict["id"]=''
                 tempDict["name"]=name
                 tempDict["username"]=number
                 tempDict["dept"]=None
                 tempDict["avatar"]='/media/default/avatar.png'
-                tempDict["dept"]=dept
-                tempDict["roles"]=[role]
+                tempDict["dept"]=request.data['dept']
+                #temp = []
+                #temp.append(request.data['roles'])
+                #tempDict["roles"]=temp
+                tempDict["role"] = request.data['roles']
                 password = make_password('0000')
                 serializer = self.get_serializer(data = tempDict)
                 serializer.is_valid(raise_exception=True)
