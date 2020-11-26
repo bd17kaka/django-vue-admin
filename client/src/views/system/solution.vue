@@ -6,6 +6,7 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增方案</el-button>
+      <el-button type="primary" icon="el-icon-document" @click="handleResult">查看所有方案</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -57,18 +58,21 @@
         </template>
       </el-table-column>
     </el-table>
-
-    <el-dialog :visible.sync="dialogTableVisible" title="方案详情">
-        <el-table >
-            <el-table-column property="solutionName" label="方案名称" width="50">
-                    <template scope="scope"><span>{{ scope.row.solutionName }}</span></template>
-            </el-table-column>
-            <el-table-column property="task_type" label="任务类型" width="50"></el-table-column>
-            <el-table-column property="create_time" label="创建日期" width="100"></el-table-column>
-            <el-table-column property="update_time" label="修改日期" width="100"></el-table-column>
-            <el-table-column property="matched_dataset" label="数据集" width="100"></el-table-column>
-            <el-table-column property="description" label="任务描述" width="100"></el-table-column>
-            <el-table-column property="task_status" label="任务状态" width="100"></el-table-column>
+    <el-dialog :visible.sync="dialogTableVisible" title="方案详细信息" width="80%">
+        <el-table :data="solutionShowList" border>
+            <el-table-column property="userName" label="学号"></el-table-column>
+            <el-table-column property="solutionName" label="方案名称"></el-table-column>
+            <el-table-column property="taskName" label="任务名称"></el-table-column>
+            <el-table-column property="codeAddr" label="代码地址"></el-table-column>
+            <el-table-column property="solutionResult" label="方案结果"></el-table-column>
+        </el-table>
+    </el-dialog>
+    <el-dialog :visible.sync="dialogTableAllVisible" title="方案详细信息" width="80%">
+        <el-table :data="solutionList.results" border>
+            <el-table-column property="userName" label="学号" ></el-table-column>
+            <el-table-column property="solutionName" label="方案名称" ></el-table-column>
+            <el-table-column property="taskName" label="任务名称" ></el-table-column>
+            <el-table-column property="solutionResult" label="方案结果"></el-table-column>
         </el-table>
     </el-dialog>
 
@@ -86,7 +90,7 @@
         <el-form-item label="任务名称" prop="taskName">
 
           <el-select v-model="solution.taskName" placeholder="请选择任务名称" style="width:100%">
-           <el-option
+            <el-option
             v-for="item in taskList"
              :key="item.id"
              :label="item.label"
@@ -142,6 +146,7 @@ import checkPermission from '@/utils/permission'
 import {getTaskAll} from "@/api/task";
 import {upHeaders, upUrl} from "@/api/file";
 import Pagination from "@/components/Pagination"
+import {getInfo} from "@/api/user";
 
 const defaultM = {
   id: '',
@@ -156,12 +161,21 @@ export default {
       solution: {
         id: '',
         solutionName: '',
-        taskName:'',
-        codeAddr:'',
+        taskName: '',
+        codeAddr: '',
+        userName: ''
       },
       search: '',
       tableData: [],
       solutionList: {count:0},
+      solutionShowList: [{
+        id: '',
+        solutionName: '',
+        taskName: '',
+        codeAddr: '',
+        userName: '',
+        solutionResult: ''
+      }],
       listQuery: {
         page: 1,
         page_size: 20
@@ -170,6 +184,7 @@ export default {
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
+      dialogTableAllVisible: false,
       dialogType: 'new',
       rule1: {
         solutionName: [{ required: true, message: '请输入名称', trigger: 'blur' }]
@@ -184,7 +199,7 @@ export default {
   methods: {
     checkPermission,
     handleAvatarSuccess(res, file) {
-        this.user.avatar = res.data.path
+      this.user.avatar = res.data.path
     },
     beforeAvatarUpload(file) {
       const notNull = file.size / 1024 / 1024 > 0;
@@ -218,11 +233,24 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-
+    handleResult() {
+      this.dialogTableAllVisible = true
+    },
     handleShow(scope) {
-        this.dialogTableVisible = true
+      this.solutionShowList[0].id = scope.row.id
+      this.solutionShowList[0].solutionName = scope.row.solutionName
+      this.solutionShowList[0].taskName = scope.row.taskName
+      this.solutionShowList[0].codeAddr = scope.row.codeAddr
+      this.solutionShowList[0].userName = scope.row.userName
+      this.solutionShowList[0].solutionResult = scope.row.solutionResult
+      this.dialogTableVisible = true
     },
     handleAdd() {
+      getInfo().then(response => {
+        console.log(response.data.username)
+        this.solution.userName = response.data.username
+        console.log(this.solution.userName)
+      })
       this.solution = Object.assign({}, defaultM)
       this.dialogType = 'new'
       this.dialogFormVisible = true
@@ -230,7 +258,7 @@ export default {
         this.$refs['Form'].clearValidate()
       })
     },
-    handleEdit(scope) {             //TODO
+    handleEdit(scope) {
       this.solution = Object.assign({}, scope.row)
       this.dialogType = 'edit'
       this.dialogFormVisible = true
@@ -238,7 +266,7 @@ export default {
         this.$refs['Form'].clearValidate()
       })
     },
-    handleDelete(scope) {           //TODO
+    handleDelete(scope) {
       console.log(scope)
       this.$confirm('确认删除?', '警告', {
         confirmButtonText: '确认',
