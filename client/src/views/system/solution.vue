@@ -1,7 +1,7 @@
 <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input v-model="listQuery.search" placeholder="请输入方案名称进行搜索" 
+      <el-input v-model="listQuery.search" placeholder="请输入方案名称进行搜索"
         style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
@@ -42,7 +42,7 @@
             type="primary"
             size="small"
             icon="el-icon-edit"
-            :disabled="!checkPermission(['solutionUpdate'])"
+            :disabled="!checkPermission(['solution_update'])"
             @click="handleEdit(scope)"
             title="修改"
           />
@@ -50,7 +50,7 @@
             type="danger"
             size="small"
             icon="el-icon-delete"
-            :disabled="!checkPermission(['solutionDelete'])"
+            :disabled="!checkPermission(['solution_delete'])"
             @click="handleDelete(scope)"
             title="删除"
           />

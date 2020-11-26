@@ -24,8 +24,9 @@ export default {
   },
   data() {
     return {
-      title: 'Django Vue Admin',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: 'AiShare',
+      //logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      logo:'https://ss0.bdstatic.com/70cFuHSh_Q1YnxGkpoWK1HF6hhy/it/u=2655175693,4053046651&fm=26&gp=0.jpg'
     }
   }
 }

@@ -282,7 +282,8 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
     """
     文件-增删改查
     """
-    perms_map = None
+    perms_map = {'get': '*', 'post': 'file_create',
+                 'put': 'file_update', 'delete': 'file_delete'}
     parser_classes = [MultiPartParser, JSONParser]
     queryset = File.objects.all()
     serializer_class = FileSerializer
@@ -313,7 +314,7 @@ class MeasurementViewSet(ModelViewSet):
     评价指标管理-增删改查
     """
     perms_map = {'get': '*', 'post': 'measurement_create',
-                 'put': 'measurement_create', 'delete': 'measurement_create'}
+                 'put': 'measurement_update', 'delete': 'measurement_delete'}
     queryset = Measurement.objects.all()
     serializer_class = MeasurementSerializer
     pagination_class = None
@@ -369,8 +370,8 @@ class solutionViewSet(ModelViewSet):
     """
     方案管理-增删改查
     """
-    perms_map = {'get': '*', 'post': 'solutionCreate',
-                 'put': 'solutionUpdate', 'delete': 'solutionDelete'}
+    perms_map = {'get': '*', 'post': 'solution_create',
+                 'put': 'solution_update', 'delete': 'solution_delete'}
     queryset = solution.objects.all()
     serializer_class = solutionSerializer
     # pagination_class = None

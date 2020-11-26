@@ -47,7 +47,7 @@
             type="primary"
             size="small"
             icon="el-icon-edit"
-            :disabled="!checkPermission(['org_update'])"
+            :disabled="!checkPermission(['measurement_update'])"
             @click="handleEdit(scope)"
           />
           <el-button
@@ -107,7 +107,7 @@
         :rules="rule1"
       >
         <el-form-item label="评价指标名称" prop="name">
-          <el-input v-model="measurement.name" placeholder="请输入名称" />
+          <el-input v-model="measurement.name" :disabled="true" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="评价指标描述" prop="description">
           <el-input type="textarea" v-model="measurement.description" placeholder="请输入描述" maxlength="500" show-word-limit/>
@@ -119,6 +119,7 @@
             :action="upUrl"
             :before-upload="beforeUpload"
             :headers="upHeaders"
+            :on-success="UploadSuccess"
           >
           <el-button size="small" type="primary">点击上传</el-button>
           <div slot="tip" class="el-upload__tip">只能上传py文件</div>
@@ -238,15 +239,19 @@ export default {
     },
     beforeUpload(file) {
       const isPy = file.name.endsWith('.py');
-      if(file.name != this.measurement.name+'.py'){
-        this.$message.error('文件名称与评价指标名不匹配');
-        return false;
-      }
+      // if(file.name != this.measurement.name+'.py'){
+      //   this.$message.error('文件名称与评价指标名不匹配');
+      //   return false;
+      // }
       if(!isPy){
         this.$message.error('请选择py文件！');
         return false;
       }
       else return true;
+    },
+    UploadSuccess(res,file) {
+      var str=res.data.name;
+      this.measurement.name=str.substr(0,str.length -3);
     },
     async confirm(form) {
       this.$refs[form].validate(valid => {

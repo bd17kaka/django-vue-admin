@@ -1,7 +1,7 @@
     <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input v-model="listQuery.search" placeholder="请输入数据集名称" 
+      <el-input v-model="listQuery.search" placeholder="请输入数据集名称"
         style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
@@ -22,9 +22,9 @@
       <el-table-column type="index" width="50" />
       <el-table-column label="数据集名称" width="150">
         <template slot-scope="scope">
-          <el-link 
-            type="primary" 
-            :href="'http://localhost:8000/media/'+scope.row.dataset_name+'.zip'" 
+          <el-link
+            type="primary"
+            :href="'http://localhost:8000/media/'+scope.row.dataset_name+'.zip'"
             target="_blank">
             {{ scope.row.dataset_name }}
           </el-link>
@@ -52,7 +52,7 @@
             type="info"
             size="small"
             icon="el-icon-view"
-            :disabled="!checkPermission(['task_query'])"
+            :disabled="!checkPermission(['dataset_query'])"
             @click="handleShow(scope)"
             title="查看详细信息"
           />
@@ -60,7 +60,7 @@
             type="primary"
             size="small"
             icon="el-icon-edit"
-            :disabled="!checkPermission(['task_update'])"
+            :disabled="!checkPermission(['dataset_update'])"
             @click="handleEdit(scope)"
             title="修改"
           />
