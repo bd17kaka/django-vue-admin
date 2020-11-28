@@ -68,7 +68,7 @@
         </el-table>
     </el-dialog>
     <el-dialog :visible.sync="dialogTableAllVisible" title="方案详细信息" width="80%">
-        <el-table :data="solutionList.results" border>
+        <el-table :data="solutionAllShowList" border>
             <el-table-column property="userName" label="学号" ></el-table-column>
             <el-table-column property="solutionName" label="方案名称" ></el-table-column>
             <el-table-column property="taskName" label="任务名称" ></el-table-column>
@@ -146,7 +146,8 @@ import checkPermission from '@/utils/permission'
 import {getTaskAll} from "@/api/task";
 import {upHeaders, upUrl} from "@/api/file";
 import Pagination from "@/components/Pagination"
-import {getInfo} from "@/api/user";
+import {getInfo, getUserAll} from "@/api/user";
+
 
 const defaultM = {
   id: '',
@@ -163,11 +164,12 @@ export default {
         solutionName: '',
         taskName: '',
         codeAddr: '',
-        userName: ''
+        userId: ''
       },
       search: '',
       tableData: [],
       solutionList: {count:0},
+      solutionAllShowList: [],
       solutionShowList: [{
         id: '',
         solutionName: '',
@@ -181,6 +183,7 @@ export default {
         page_size: 20
       },
       taskList:[],
+      user: [],
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
@@ -195,6 +198,7 @@ export default {
   created() {
     this.getList()
     this.getTaskAll()
+    this.getUserAll()
   },
   methods: {
     checkPermission,
@@ -211,6 +215,11 @@ export default {
     getTaskAll() {
       getTaskAll().then(response => {
         this.taskList = genTree(response.data.results);
+      });
+    },
+    getUserAll() {
+      getUserAll().then(response => {
+        this.user = genTree(response.data.results);
       });
     },
     getList() {
@@ -234,22 +243,36 @@ export default {
       this.getList();
     },
     handleResult() {
+      this.solutionAllShowList = []
+      for (var i = 0; i < this.solutionList.results.length; i++) {
+        var username_temp = ''
+        for (var j = 0; j < this.user.length; j++) {
+          if (this.user[j].id == this.solutionList.results[j].userId) {
+            username_temp = this.user[j].username
+            break
+          }
+        }
+        this.solutionAllShowList.push({ userName: username_temp, solutionName: this.solutionList.results[i].solutionName,
+          taskName: this.solutionList.results[i].taskName, solutionResult: this.solutionList.results[i].solutionResult })
+      }
       this.dialogTableAllVisible = true
     },
     handleShow(scope) {
-      this.solutionShowList[0].id = scope.row.id
+      // this.solutionShowList[0].id = scope.row.id
       this.solutionShowList[0].solutionName = scope.row.solutionName
       this.solutionShowList[0].taskName = scope.row.taskName
       this.solutionShowList[0].codeAddr = scope.row.codeAddr
-      this.solutionShowList[0].userName = scope.row.userName
+      for (var i = 0; i < this.user.length; i++) {
+        if (this.user[i].id == scope.row.userId) {
+          this.solutionShowList[0].userName = this.user[i].username
+        }
+      }
       this.solutionShowList[0].solutionResult = scope.row.solutionResult
       this.dialogTableVisible = true
     },
     handleAdd() {
       getInfo().then(response => {
-        console.log(response.data.username)
-        this.solution.userName = response.data.username
-        console.log(this.solution.userName)
+        this.solution.userId = response.data.id
       })
       this.solution = Object.assign({}, defaultM)
       this.dialogType = 'new'

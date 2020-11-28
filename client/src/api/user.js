@@ -30,6 +30,13 @@ export function getUserList(query) {
   })
 }
 
+export function getUserAll() {
+  return request({
+    url: '/system/user/',
+    method: 'get'
+  })
+}
+
 export function getUser(id) {
   return request({
     url: `/system/user/${id}/`,
