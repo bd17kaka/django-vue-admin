@@ -5,8 +5,8 @@ from django.db.models.query import QuerySet
 
 from utils.model import SoftModel, BaseModel
 from simple_history.models import HistoricalRecords
-from django.contrib.postgres.fields import JSONField
-# from django_mysql.models import JSONField
+# from django.contrib.postgres.fields import JSONField
+from django_mysql.models import JSONField
 
 
 
@@ -159,7 +159,7 @@ class Dict(SoftModel):
     parent = models.ForeignKey('self', null=True, blank=True,
                             on_delete=models.SET_NULL, verbose_name='父')
     is_used = models.BooleanField('是否有效', default=True)
-    history = HistoricalRecords()
+    # history = HistoricalRecords()
 
     class Meta:
         verbose_name = '字典'
@@ -267,7 +267,7 @@ class Task(BaseModel):
     # status_type_choices = ((0, 0),(1, 1))
     task_name = models.CharField('任务名称', max_length=100, unique=True)
     task_type = models.CharField('任务类型', max_length=100)
-    task_measurement = models.CharField('评价指标', max_length=100)
+    task_measurement = models.CharField('评价指标', max_length=100, null=True)
     matched_dataset = models.CharField('数据集', max_length=100)
     description = models.TextField('描述', null=True)
     task_status = models.IntegerField('任务状态', default=0)

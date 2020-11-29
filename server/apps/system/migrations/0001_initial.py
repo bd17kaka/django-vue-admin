@@ -3,7 +3,10 @@
 from django.conf import settings
 import django.contrib.auth.models
 import django.contrib.auth.validators
-import django.contrib.postgres.fields.jsonb
+# import django.contrib.postgres.fields.jsonb
+
+from django_mysql.models import JSONField
+
 from django.db import migrations, models
 import django.db.models.deletion
 import django.utils.timezone
@@ -73,7 +76,7 @@ class Migration(migrations.Migration):
                 ('code', models.CharField(blank=True, max_length=30, null=True, verbose_name='编号')),
                 ('fullname', models.CharField(blank=True, max_length=1000, null=True, verbose_name='全名')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='描述')),
-                ('other', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='其它信息')),
+                ('other', JSONField(blank=True, null=True, verbose_name='其它信息')),
                 ('sort', models.IntegerField(default=1, verbose_name='排序')),
                 ('is_used', models.BooleanField(default=True, verbose_name='是否有效')),
                 ('parent', models.ForeignKey(blank=True, null=True, on_delete=django.db.models.deletion.SET_NULL, to='system.Dict', verbose_name='父')),
@@ -244,7 +247,7 @@ class Migration(migrations.Migration):
                 ('code', models.CharField(blank=True, max_length=30, null=True, verbose_name='编号')),
                 ('fullname', models.CharField(blank=True, max_length=1000, null=True, verbose_name='全名')),
                 ('description', models.TextField(blank=True, null=True, verbose_name='描述')),
-                ('other', django.contrib.postgres.fields.jsonb.JSONField(blank=True, null=True, verbose_name='其它信息')),
+                ('other', JSONField(blank=True, null=True, verbose_name='其它信息')),
                 ('sort', models.IntegerField(default=1, verbose_name='排序')),
                 ('is_used', models.BooleanField(default=True, verbose_name='是否有效')),
                 ('history_id', models.AutoField(primary_key=True, serialize=False)),
