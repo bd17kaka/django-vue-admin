@@ -1,7 +1,7 @@
 import logging
 import os
 import pandas as pd
-
+import shutil
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.cache import cache
@@ -294,6 +294,7 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
     def perform_create(self, serializer):
         fileobj = self.request.data.get('file')
         name = fileobj._name
+        #print(name)
         size = fileobj.size
         mime = fileobj.content_type
         type = '其它'
@@ -305,9 +306,29 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
             type = '音频'
         elif 'application' or 'text' in mime:
             type = '文档'
-        instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-        instance.path = settings.MEDIA_URL + name
-        instance.save()
+        if '_' in name:
+            dir_name, file_name = name.split('_')
+
+            current_path = os.path.abspath(os.path.dirname(__file__))
+            parent_path = os.path.dirname(current_path)
+            parent_path = os.path.dirname(parent_path)
+            media_path = parent_path + '\\media'
+            #print(media_path)
+            dir_path = media_path + '\\codes\\' + dir_name
+            #print(dir_path)
+            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+            instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
+            #print(instance.path)
+            instance.save()
+            #print(os.path.exists(dir_path))
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
+            # os.remove(os.path.name)
+        else:
+            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+            instance.path = settings.MEDIA_URL + name
+            instance.save()
 
 class MeasurementViewSet(ModelViewSet):
     """
