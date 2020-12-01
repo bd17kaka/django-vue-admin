@@ -288,6 +288,7 @@ class solution(BaseModel):
     taskName = models.CharField('所属任务', max_length=200)
     userId = models.BigIntegerField('所属用户id', null=True)
     solutionResult = models.CharField('运行结果', max_length=100, null=True)
+    solution_status = models.IntegerField('任务状态', default=0)
 
 
     class Meta:
