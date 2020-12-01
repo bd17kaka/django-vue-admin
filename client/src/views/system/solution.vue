@@ -60,7 +60,7 @@
     </el-table>
     <el-dialog :visible.sync="dialogTableVisible" title="方案详细信息" width="80%">
         <el-table :data="solutionShowList" border>
-            <el-table-column property="userName" label="学号"></el-table-column>
+            <el-table-column property="userName" label="用户名"></el-table-column>
             <el-table-column property="solutionName" label="方案名称"></el-table-column>
             <el-table-column property="taskName" label="任务名称"></el-table-column>
             <el-table-column property="codeAddr" label="代码地址"></el-table-column>
@@ -84,9 +84,6 @@
         label-position="right"
         :rules="rule1"
       >
-        <el-form-item label="方案名称" prop="solutionName">
-          <el-input v-model="solution.solutionName" placeholder="方案名称" />
-        </el-form-item>
         <el-form-item label="任务名称" prop="taskName">
 
           <el-select v-model="solution.taskName" placeholder="请选择任务名称" style="width:100%">
@@ -99,10 +96,32 @@
           </el-select>
           </select>
         </el-form-item>
-
-        <el-form-item label="代码地址" prop="solutionName">
-          <el-input v-model="solution.codeAddr" placeholder="代码地址" />
+            
+        <el-form-item label="代码地址" prop="addr">
+          <el-input v-model="solution.codeAddr"  placeholder="代码地址">
+          </el-input>
         </el-form-item>
+
+        <el-form-item label="上传方案">
+          <el-upload
+            ref="upload"
+            class="upload-demo"
+            accept=".zip"
+            :action="upUrl"
+            :before-upload="beforeUpload"
+            :headers="upHeaders"
+            :on-success="UploadSuccess"
+          >
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传zip文件</div>
+          </el-upload>
+        </el-form-item>
+
+        <el-form-item label="方案名称" :disabled="true" prop="solutionName">
+          <el-input v-model="solution.solutionName" placeholder="方案名称" />
+        </el-form-item>
+
+        <!-- </el-form-item>
               <el-form-item label="上传文件" prop="dept">
                 <el-upload
                   class="avatar-uploader"
@@ -115,7 +134,7 @@
                 >
                   <i class="el-icon-plus avatar-uploader-icon" />
                 </el-upload>
-        </el-form-item>
+        </el-form-item> -->
       </el-form>
 
       <div style="text-align:right;">
@@ -202,15 +221,27 @@ export default {
   },
   methods: {
     checkPermission,
-    handleAvatarSuccess(res, file) {
-      this.user.avatar = res.data.path
+    // handleAvatarSuccess(res, file) {
+    //   this.user.avatar = res.data.path
+    // },
+    // beforeAvatarUpload(file) {
+    //   const notNull = file.size / 1024 / 1024 > 0;
+    //   if (!notNull) {
+    //     this.$message.error("文件不能为空");
+    //   }
+    //   return notNull;
+    // },
+    UploadSuccess(res,file) {
+      var str=res.data.name;
+      this.solution.solutionName=str.substr(0,str.length -4);
     },
-    beforeAvatarUpload(file) {
-      const notNull = file.size / 1024 / 1024 > 0;
-      if (!notNull) {
-        this.$message.error("文件不能为空");
+    beforeUpload(file) {                //返回fasle停止上传,检查压缩包名称和格式
+      const isZip = file.name.endsWith('.zip');
+      if(!isZip){
+        this.$message.error('请选择zip文件！');
+        return false;
       }
-      return notNull;
+      else return true;
     },
     getTaskAll() {
       getTaskAll().then(response => {
@@ -328,6 +359,7 @@ export default {
           } else {
             createSolution(this.solution).then(res => {
               this.getList()
+              this.$refs.upload.clearFiles()
               this.dialogFormVisible = false
               this.$message({
                 message: '新增成功',
