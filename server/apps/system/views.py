@@ -27,14 +27,14 @@ from utils.queryset import get_child_queryset2
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User, Measurement, Task, Dataset, solution, Tasktype)
+                     Role, User, Measurement, Task, Dataset, Solution, Tasktype)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
                           PositionSerializer, RoleSerializer, TaskSerializer,
                           UserCreateSerializer, UserListSerializer,
-                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, solutionSerializer, TasktypeSerializer)
+                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer)
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -342,15 +342,7 @@ class MeasurementViewSet(ModelViewSet):
     search_fields = ['name']
     ordering_fields = ['sort']
     ordering = ['pk']
-    def perform_destroy(self, instance):
-        #print(instance.name)
-        current_dir = os.path.abspath(os.path.dirname(__file__))
-        #print(current_dir)
-        parent_path = os.path.dirname(current_dir)
-        parent_path = os.path.dirname(parent_path)
-        #print(parent_path)
-        os.remove(parent_path+'/media/'+instance.name+'.py')
-        instance.delete()
+
 
 class TaskViewSet(ModelViewSet):
     '''
@@ -387,14 +379,14 @@ class DatasetViewSet(ModelViewSet):
         instance.delete()
 
 
-class solutionViewSet(ModelViewSet):
+class SolutionViewSet(ModelViewSet):
     """
     方案管理-增删改查
     """
     perms_map = {'get': '*', 'post': 'solution_create',
                  'put': 'solution_update', 'delete': 'solution_delete'}
-    queryset = solution.objects.all()
-    serializer_class = solutionSerializer
+    queryset = Solution.objects.all()
+    serializer_class = SolutionSerializer
     # pagination_class = None
     # filterset_class = UserFilter
     search_fields = ['solutionId','solutionName', 'taskName']

@@ -5,7 +5,7 @@
         style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
-      <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增任务</el-button>
+      <el-button type="primary" icon="el-icon-plus" :disabled="!checkPermission(['task_create'])" @click="handleAdd">新增任务</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -115,12 +115,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="评价指标" prop="task_measurement">
-          <el-select v-model ="task.task_measurement" placeholder="请选择评价指标" style = "width:100%">
+          <el-select v-model ="task.task_measurement" multiple placeholder="请选择评价指标" style = "width:100%">
             <el-option
             v-for="item in measurement"
-            :key="item.id"
+            :key="item.value"
             :label="item.label"
-            :value="item.name"
+            :value="item.value"
             />
           </el-select>
         </el-form-item>

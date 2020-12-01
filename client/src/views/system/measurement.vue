@@ -36,11 +36,6 @@
           <span>{{ scope.row.description }}</span>
         </template>
       </el-table-column>
-      <el-table-column label="评价指标地址">
-        <template slot-scope="scope">
-          <span>{{ scope.row.addr }}</span>
-        </template>
-      </el-table-column>
       <el-table-column align="center" label="操作" width="150">
         <template slot-scope="scope">
           <el-button
@@ -75,23 +70,6 @@
         <el-form-item label="评价指标描述" prop="description">
           <el-input type="textarea" v-model="measurement.description" placeholder="请输入描述" maxlength="500" show-word-limit/>
         </el-form-item>
-        <el-form-item label="上传评价指标">
-          <el-upload
-            ref="upload"
-            class="upload-demo"
-            :action="upUrl"
-            :before-upload="beforeUpload"
-            :headers="upHeaders"
-          >
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传py文件</div>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="评价指标地址" prop="">
-          <el-input v-model="measurement.name" :disabled="true" placeholder="评价指标地址">
-            <template slot="prepend">/media/</template>
-          </el-input>
-        </el-form-item>
       </el-form>
       <div style="text-align:right;">
         <el-button type="danger" @click="dialogTableVisible=false">取消</el-button>
@@ -102,33 +80,15 @@
       <el-form
         ref="Form"
         :model="measurement"
-        label-width="100px"
+        label-width="120px"
         label-position="right"
         :rules="rule1"
       >
         <el-form-item label="评价指标名称" prop="name">
-          <el-input v-model="measurement.name" :disabled="true" placeholder="请输入名称" />
+          <el-input v-model="measurement.name" placeholder="请输入名称" />
         </el-form-item>
         <el-form-item label="评价指标描述" prop="description">
           <el-input type="textarea" v-model="measurement.description" placeholder="请输入描述" maxlength="500" show-word-limit/>
-        </el-form-item>
-        <el-form-item label="上传评价指标">
-          <el-upload
-            ref="upload"
-            class="upload-demo"
-            :action="upUrl"
-            :before-upload="beforeUpload"
-            :headers="upHeaders"
-            :on-success="UploadSuccess"
-          >
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传py文件</div>
-          </el-upload>
-        </el-form-item>
-        <el-form-item label="评价指标地址" prop="">
-          <el-input v-model="measurement.name" :disabled="true" placeholder="评价指标地址">
-            <template slot="prepend">/media/</template>
-          </el-input>
         </el-form-item>
       </el-form>
       <div style="text-align:right;">
@@ -144,13 +104,11 @@ import {
   getMeasurementAll,
   createMeasurement,
   deleteMeasurement,
-  // deleteMeasurementFile,
   updateMeasurement
 } from '@/api/measurement'
 import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
-import {getTaskAll} from '@/api/task';
-import {upHeaders, upUrl} from '@/api/file';
+
 
 const defaultM = {
   id: '',
@@ -165,8 +123,6 @@ export default {
       },
       search: '',
       tableData: [],
-      upHeaders: upHeaders(),
-      upUrl: upUrl(),
       measurementList: [],
       listLoading: true,
       dialogFormVisible: false,
@@ -237,22 +193,6 @@ export default {
           console.error(err)
         })
     },
-    beforeUpload(file) {
-      const isPy = file.name.endsWith('.py');
-      // if(file.name != this.measurement.name+'.py'){
-      //   this.$message.error('文件名称与评价指标名不匹配');
-      //   return false;
-      // }
-      if(!isPy){
-        this.$message.error('请选择py文件！');
-        return false;
-      }
-      else return true;
-    },
-    UploadSuccess(res,file) {
-      var str=res.data.name;
-      this.measurement.name=str.substr(0,str.length -3);
-    },
     async confirm(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
@@ -260,21 +200,16 @@ export default {
           if (isEdit) {
             updateMeasurement(this.measurement.id, this.measurement).then(() => {
               this.getList()
-              this.$refs.upload.clearFiles()
               this.dialogTableVisible = false
               this.$message({
                 message: '编辑成功',
                 type: 'success',
               })
             })
-            this.$refs.upload.clearFiles()
           } else {
             this.measurement.addr = '/media/' + this.measurement.name
             createMeasurement(this.measurement).then(res => {
-              // this.measurement = res.data
-              // this.tableData.unshift(this.measurement)
               this.getList()
-              this.$refs.upload.clearFiles();
               this.dialogFormVisible = false
               this.$message({
                 message: '新增成功',

@@ -232,7 +232,6 @@ class File(CommonAModel):
 class Measurement(BaseModel):
     name = models.CharField('名称', max_length=32, unique=True)
     description = models.CharField('描述', max_length=500, blank=True, null=True)
-    addr = models.CharField('地址', max_length=500)
 
     class Meta:
         verbose_name = '评价指标'
@@ -267,7 +266,7 @@ class Task(BaseModel):
     # status_type_choices = ((0, 0),(1, 1))
     task_name = models.CharField('任务名称', max_length=100, unique=True)
     task_type = models.CharField('任务类型', max_length=100)
-    task_measurement = models.CharField('评价指标', max_length=100, null=True)
+    task_measurement = models.ManyToManyField(Measurement, blank=True, verbose_name='评价指标')
     matched_dataset = models.CharField('数据集', max_length=100)
     description = models.TextField('描述', null=True)
     task_status = models.IntegerField('任务状态', default=0)
@@ -281,7 +280,7 @@ class Task(BaseModel):
         return self.task_name
 
 
-class solution(BaseModel):
+class Solution(BaseModel):
     solutionId = models.AutoField('ID', primary_key=True)
     solutionName = models.CharField('方案名称', max_length=50)
     codeAddr = models.CharField('代码地址', max_length=200)
@@ -306,7 +305,7 @@ class Tasktype(BaseModel):
 
     # status_type_choices = ((0, 0),(1, 1))
     tasktype_name = models.CharField('任务类型名称', max_length=100, unique=True)
-    tasktype_description = models.TextField('描述')
+    tasktype_description = models.TextField('描述',null=True)
 
     # choices=status_type_choices
     class Meta:

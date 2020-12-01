@@ -4,7 +4,7 @@ import re
 from rest_framework import serializers
 
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User, Measurement, Task, Dataset, solution, Tasktype)
+                     Role, User, Measurement, Task, Dataset, Solution, Tasktype)
 
 # class TaskSerializer(serializers.ModelSerializer):
 #     class Meta:
@@ -164,9 +164,9 @@ class DatasetSerializer(serializers.ModelSerializer):
         model = Dataset
         fields = '__all__'
 
-class solutionSerializer(serializers.ModelSerializer):
+class SolutionSerializer(serializers.ModelSerializer):
     class Meta:
-        model = solution
+        model = Solution
         fields = '__all__'
 
 
