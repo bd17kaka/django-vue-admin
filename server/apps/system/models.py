@@ -283,7 +283,6 @@ class Task(BaseModel):
 class Solution(BaseModel):
     solutionId = models.AutoField('ID', primary_key=True)
     solutionName = models.CharField('方案名称', max_length=50)
-    codeAddr = models.CharField('代码地址', max_length=200)
     taskName = models.CharField('所属任务', max_length=200)
     userId = models.BigIntegerField('所属用户id', null=True)
     solutionResult = models.CharField('运行结果', max_length=100, null=True)

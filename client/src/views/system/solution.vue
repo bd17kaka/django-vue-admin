@@ -6,7 +6,6 @@
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增方案</el-button>
-      <el-button type="primary" icon="el-icon-document" @click="handleResult">查看所有方案</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -63,18 +62,11 @@
             <el-table-column property="userName" label="用户名"></el-table-column>
             <el-table-column property="solutionName" label="方案名称"></el-table-column>
             <el-table-column property="taskName" label="任务名称"></el-table-column>
-            <el-table-column property="codeAddr" label="代码地址"></el-table-column>
             <el-table-column property="solutionResult" label="方案结果"></el-table-column>
+          <el-table-column property="solution_status" label="方案状态"></el-table-column>
         </el-table>
     </el-dialog>
-    <el-dialog :visible.sync="dialogTableAllVisible" title="方案详细信息" width="80%">
-        <el-table :data="solutionAllShowList" border>
-            <el-table-column property="userName" label="学号" ></el-table-column>
-            <el-table-column property="solutionName" label="方案名称" ></el-table-column>
-            <el-table-column property="taskName" label="任务名称" ></el-table-column>
-            <el-table-column property="solutionResult" label="方案结果"></el-table-column>
-        </el-table>
-    </el-dialog>
+
 
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑方案':'新增方案'">
       <el-form
@@ -94,12 +86,6 @@
              :value="item.task_name"
            />
           </el-select>
-          </select>
-        </el-form-item>
-            
-        <el-form-item label="代码地址" prop="addr">
-          <el-input v-model="solution.codeAddr"  placeholder="代码地址">
-          </el-input>
         </el-form-item>
 
         <el-form-item label="上传方案">
@@ -117,24 +103,9 @@
           </el-upload>
         </el-form-item>
 
-        <el-form-item label="方案名称" :disabled="true" prop="solutionName">
-          <el-input v-model="solution.solutionName" placeholder="方案名称" />
+        <el-form-item label="方案名称" prop="solutionName">
+          <el-input v-model="solution.solutionName" :disabled="true" placeholder="方案名称" />
         </el-form-item>
-
-        <!-- </el-form-item>
-              <el-form-item label="上传文件" prop="dept">
-                <el-upload
-                  class="avatar-uploader"
-                  :action="upUrl"
-                  accept=".zip"
-                  :show-file-list="false"
-                  :on-success="handleAvatarSuccess"
-                  :before-upload="beforeAvatarUpload"
-                  :headers="upHeaders"
-                >
-                  <i class="el-icon-plus avatar-uploader-icon" />
-                </el-upload>
-        </el-form-item> -->
       </el-form>
 
       <div style="text-align:right;">
@@ -182,20 +153,18 @@ export default {
         id: '',
         solutionName: '',
         taskName: '',
-        codeAddr: '',
         userId: ''
       },
       search: '',
       tableData: [],
       solutionList: {count:0},
-      solutionAllShowList: [],
       solutionShowList: [{
         id: '',
         solutionName: '',
         taskName: '',
-        codeAddr: '',
         userName: '',
-        solutionResult: ''
+        solutionResult: '',
+        solution_status: ''
       }],
       listQuery: {
         page: 1,
@@ -206,7 +175,6 @@ export default {
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
-      dialogTableAllVisible: false,
       dialogType: 'new',
       rule1: {
         solutionName: [{ required: true, message: '请输入名称', trigger: 'blur' }]
@@ -221,16 +189,6 @@ export default {
   },
   methods: {
     checkPermission,
-    // handleAvatarSuccess(res, file) {
-    //   this.user.avatar = res.data.path
-    // },
-    // beforeAvatarUpload(file) {
-    //   const notNull = file.size / 1024 / 1024 > 0;
-    //   if (!notNull) {
-    //     this.$message.error("文件不能为空");
-    //   }
-    //   return notNull;
-    // },
     UploadSuccess(res,file) {
       var str=res.data.name;
       this.solution.solutionName=str.substr(0,str.length -4);
@@ -273,32 +231,17 @@ export default {
       this.listQuery.page = 1;
       this.getList();
     },
-    handleResult() {
-      this.solutionAllShowList = []
-      for (var i = 0; i < this.solutionList.results.length; i++) {
-        var username_temp = ''
-        for (var j = 0; j < this.user.length; j++) {
-          if (this.user[j].id == this.solutionList.results[j].userId) {
-            username_temp = this.user[j].username
-            break
-          }
-        }
-        this.solutionAllShowList.push({ userName: username_temp, solutionName: this.solutionList.results[i].solutionName,
-          taskName: this.solutionList.results[i].taskName, solutionResult: this.solutionList.results[i].solutionResult })
-      }
-      this.dialogTableAllVisible = true
-    },
     handleShow(scope) {
       // this.solutionShowList[0].id = scope.row.id
       this.solutionShowList[0].solutionName = scope.row.solutionName
       this.solutionShowList[0].taskName = scope.row.taskName
-      this.solutionShowList[0].codeAddr = scope.row.codeAddr
       for (var i = 0; i < this.user.length; i++) {
         if (this.user[i].id == scope.row.userId) {
           this.solutionShowList[0].userName = this.user[i].username
         }
       }
       this.solutionShowList[0].solutionResult = scope.row.solutionResult
+      this.solutionShowList[0].solution_status = scope.row.solution_status
       this.dialogTableVisible = true
     },
     handleAdd() {

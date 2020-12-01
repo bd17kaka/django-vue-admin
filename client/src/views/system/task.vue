@@ -5,7 +5,7 @@
         style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
-      <el-button type="primary" icon="el-icon-plus" :disabled="!checkPermission(['task_create'])" @click="handleAdd">新增任务</el-button>
+      <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增任务</el-button>
     </div>
     <el-table
       v-loading="listLoading"
@@ -24,9 +24,9 @@
         <template slot-scope="scope">{{ scope.row.task_name }}</template>
       </el-table-column>
 
-      <el-table-column label="任务类型">
-        <template slot-scope="scope">{{ scope.row.task_type }}</template>
-      </el-table-column>
+<!--      <el-table-column label="任务类型">-->
+<!--        <template slot-scope="scope">{{ scope.row.task_type }}</template>-->
+<!--      </el-table-column>-->
 
       <el-table-column label="创建日期">
         <template slot-scope="scope">
@@ -48,7 +48,15 @@
             icon="el-icon-view"
             :disabled="!checkPermission(['task_query'])"
             @click="handleShow(scope)"
-            title="查看详细信息"
+            title="查看任务详细信息"
+          />
+          <el-button
+            type="info"
+            size="small"
+            icon="el-icon-document"
+            :disabled="!checkPermission(['task_query'])"
+            @click="handleShowSolution(scope)"
+            title="查看该任务下所有方案"
           />
           <el-button
             type="primary"
@@ -79,7 +87,15 @@
             <el-table-column property="matched_dataset" label="数据集" width="120"></el-table-column>
             <el-table-column property="task_measurement" label="评价指标" width="120"></el-table-column>
             <el-table-column property="description" label="任务描述" width="200"></el-table-column>
-            <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>
+<!--            <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>-->
+        </el-table>
+    </el-dialog>
+
+    <el-dialog :visible.sync="dialogTableAllVisible" title="方案信息" width="80%">
+        <el-table :data="solutionAllShowList" border>
+            <el-table-column property="userName" sortable label="用户名" ></el-table-column>
+            <el-table-column property="solutionName" label="方案名称" ></el-table-column>
+            <el-table-column property="solutionResult" sortable label="方案结果"></el-table-column>
         </el-table>
     </el-dialog>
 
@@ -115,12 +131,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="评价指标" prop="task_measurement">
-          <el-select v-model ="task.task_measurement" multiple placeholder="请选择评价指标" style = "width:100%">
+          <el-select v-model ="task.task_measurement" placeholder="请选择评价指标" style = "width:100%">
             <el-option
             v-for="item in measurement"
-            :key="item.value"
+            :key="item.id"
             :label="item.label"
-            :value="item.value"
+            :value="item.name"
             />
           </el-select>
         </el-form-item>
@@ -147,6 +163,8 @@
 import { getTasktypeAll } from "@/api/tasktype"
 import { getDatasetAll } from "@/api/dataset"
 import {getMeasurementAll} from"@/api/measurement"
+import { getSolutionAll } from '@/api/solution'
+import { getUserAll } from '@/api/user'
 import {
   getTaskList,
   getTaskAll,
@@ -179,7 +197,10 @@ export default {
       },
       tasktype: [],
       dataset: [],
+      user: [],
+      solution: [],
       measurement: [],
+      solutionAllShowList: [],
       taskshowList: [{
         id: '',
         task_name: '',
@@ -194,6 +215,7 @@ export default {
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
+      dialogTableAllVisible: false,
       dialogType: 'new',
       rule1: {
         task_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
@@ -209,6 +231,8 @@ export default {
     this.getTasktypeAll()
     this.getDatasetAll()
     this.getMeasurementAll()
+    this.getSolutionAll()
+    this.getUserAll()
   },
   methods: {
     checkPermission,
@@ -241,6 +265,18 @@ export default {
         this.dataset = genTree(response.data.results);
       });
     },
+    getSolutionAll() {
+      getSolutionAll().then(response => {
+        console.log(response.data.results)
+        this.solution = response.data.results
+        console.log(this.solution)
+      })
+    },
+    getUserAll() {
+      getUserAll().then(response => {
+        this.user = genTree(response.data.results);
+      });
+    },
     getMeasurementAll() {
       getMeasurementAll().then(response => {
         this.measurement = genTree(response.data);
@@ -257,7 +293,25 @@ export default {
       this.taskshowList[0].task_status = scope.row.task_status
       this.dialogTableVisible = true
     },
-
+    handleShowSolution(scope) {
+      this.solutionAllShowList = []
+      for (var k = 0; k < this.solution.length; k++) {
+        if (this.solution[k].taskName == scope.row.task_name) {
+          var username_temp = ''
+          for (var j = 0; j < this.user.length; j++) {
+            if (this.user[j].id == this.solution[j].userId) {
+              username_temp = this.user[j].username
+              break
+            }
+          }
+          this.solutionAllShowList.push({
+            userName: username_temp, solutionName: this.solution[k].solutionName,
+            solutionResult: this.solution[k].solutionResult })
+        }
+      }
+      console.log(this.solutionAllShowList)
+      this.dialogTableAllVisible = true
+    },
     handleAdd() {
       this.task = Object.assign({}, defaultM)
       this.dialogType = 'new'
