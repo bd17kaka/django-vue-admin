@@ -2,6 +2,13 @@ import logging
 import os
 import pandas as pd
 import shutil
+
+import paramiko
+import time
+import winrm
+import json
+import numpy as np
+
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
 from django.core.cache import cache
@@ -40,6 +47,71 @@ logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
 # logger.error('请求出错-{}'.format(error))
 
+class ServerByPara(object):
+    def __init__(self, cmd, host, user, password, system_choice):
+        self.cmd = cmd
+        self.client = paramiko.SSHClient()
+        self.host = host
+        self.user = user
+        self.pwd = password
+        self.system_choice = system_choice
+
+    def exec_linux_cmd(self):
+        data_init = ''
+        
+        self.client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+        self.client.connect(hostname=self.host, username=self.user, password=self.pwd)
+        stdin, stdout, stderr = self.client.exec_command(self.cmd, get_pty=True)
+        if stderr.readlines():
+            exec_tag = 1
+            for data in stdout.readlines():
+                data_init += data
+        else:
+            exec_tag = 0
+            for data in stdout.readlines():
+                data_init += data
+        return json.dumps({
+            "exec_tag": exec_tag,
+            "data": data_init,
+        }, ensure_ascii=False)
+
+    def exec_win_cmd(self):
+        data_init = ""
+        print("开始连接")
+        s = winrm.Session(self.host, auth=(self.user, self.pwd))
+        print("连接成功")
+        # try:
+        ret = s.run_cmd(self.cmd)
+        # except:
+            
+        print(ret)
+        encoding="utf-8"
+        try: 
+            ret.std_err.decode(encoding)
+        except:
+            encoding="gbk"
+
+        if ret.std_err.decode(encoding):
+            exec_tag = 1
+            for data in ret.std_err.decode(encoding).split("\r\n"):
+                data_init += data
+        else:
+            exec_tag = 0
+            for data in ret.std_out.decode("gbk").split("\r\n"):
+                data_init += data
+        return json.dumps({
+            "exec_tag": exec_tag,
+            "data": data_init,
+        }, ensure_ascii=False)
+
+    def run(self):
+        if self.system_choice == "Linux":
+            result = self.exec_linux_cmd()
+        else:
+            result = self.exec_win_cmd()
+        print(result)
+        with open(r"script_info.txt", "w") as f:
+            f.write(result)
 
 class LogoutView(APIView):
     permission_classes = []
@@ -290,7 +362,20 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
     filterset_fields = ['type']
     search_fields = ['name']
     ordering = ['-create_time']
-
+    def sendFile(self,hereFilePath,thereFilePath):
+        hostname="10.201.147.111"
+        # username = "ADMIN"
+        username="dell"
+        password = "2019202210088"
+        port = 22
+        transport = paramiko.Transport((hostname, port))  # 建立远程连接
+        transport.connect(username=username, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        # 上传文件
+        print(hereFilePath)
+        print(thereFilePath)
+        sftp.put(hereFilePath, thereFilePath)
+    
     def perform_create(self, serializer):
         fileobj = self.request.data.get('file')
         name = fileobj._name
@@ -312,19 +397,51 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
             current_path = os.path.abspath(os.path.dirname(__file__))
             parent_path = os.path.dirname(current_path)
             parent_path = os.path.dirname(parent_path)
-            media_path = parent_path + '\\media'
-            #print(media_path)
-            dir_path = media_path + '\\codes\\' + dir_name
+            #media_path = parent_path + '\\media'
+            media_path = os.path.join(parent_path, 'media')
+            #dir_path = media_path + '\\codes\\' + dir_name
+            dir_path = os.path.join(media_path, 'codes', dir_name)
             #print(dir_path)
             instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-            instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
-            #print(instance.path)
+            #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
+            instance.path = os.path.join(settings.MEDIA_URL, dir_name, file_name)
+            print(instance.path)
             instance.save()
-            #print(os.path.exists(dir_path))
             if not os.path.exists(dir_path):
                 os.makedirs(dir_path)
             shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
             # os.remove(os.path.name)
+        elif '-' in name:
+
+            dir_name, file_name = name.split('-')
+
+            current_path = os.path.abspath(os.path.dirname(__file__))
+            parent_path = os.path.dirname(current_path)
+            parent_path = os.path.dirname(parent_path)
+            #media_path = parent_path + '\\media'
+            media_path = os.path.join(parent_path, 'media')
+            #dir_path = media_path + '\\codes\\' + dir_name
+            dir_path = os.path.join(media_path, 'dataset', dir_name)
+            #print(dir_path)
+            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+            #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
+            instance.path = os.path.join(settings.MEDIA_URL, 'dataset', dir_name, file_name)
+            print(instance.path)
+            instance.save()
+            if not os.path.exists(dir_path):
+                os.makedirs(dir_path)
+            shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
+            # os.remove(os.path.name)
+            if 'dataset' in name:
+                hostname="10.201.147.111"
+                username="dell"
+                password = "2019202210088"
+                port = 22
+                self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
+                server_obj = ServerByPara("python D:/unzip.py "+"D:/"+file_name+" D:/data/"+file_name.replace('.zip',''), hostname, username, password, "windows")
+                server_obj.run()
+                print("运行完毕")
+                
         else:
             instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
             instance.path = settings.MEDIA_URL + name
