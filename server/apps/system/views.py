@@ -437,7 +437,8 @@ class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
                 username="dell"
                 password = "2019202210088"
                 port = 22
-                self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
+                #self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
+                self.sendFile(os.path.join('/proj/django-vue-admin/server/', instance.path), "D:/"+file_name)
                 server_obj = ServerByPara("python D:/unzip.py "+"D:/"+file_name+" D:/data/"+file_name.replace('.zip',''), hostname, username, password, "windows")
                 server_obj.run()
                 print("运行完毕")
