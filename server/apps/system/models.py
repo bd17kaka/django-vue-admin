@@ -280,7 +280,7 @@ class Task(BaseModel):
         return self.task_name
 
 
-class Solution(BaseModel):
+class Solution(CommonBModel):
     solutionId = models.AutoField('ID', primary_key=True)
     solutionName = models.CharField('方案名称', max_length=50)
     taskName = models.CharField('所属任务', max_length=200)
