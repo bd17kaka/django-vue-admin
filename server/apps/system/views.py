@@ -32,7 +32,7 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from utils.queryset import get_child_queryset2
 
 from .filters import UserFilter
-from .mixins import CreateUpdateModelAMixin
+from .mixins import CreateUpdateModelAMixin, CreateUpdateModelBMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
                      Role, User, Measurement, Task, Dataset, Solution, Tasktype)
 from .permission import RbacPermission, get_permission_list
@@ -350,7 +350,7 @@ class UserViewSet(ModelViewSet):
         }
         return Response(data)
 
-class FileViewSet(CreateUpdateModelAMixin, ModelViewSet):
+class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
     """
     文件-增删改查
     """
@@ -496,7 +496,7 @@ class DatasetViewSet(ModelViewSet):
         instance.delete()
 
 
-class SolutionViewSet(ModelViewSet):
+class SolutionViewSet(RbacFilterSet, ModelViewSet):
     """
     方案管理-增删改查
     """

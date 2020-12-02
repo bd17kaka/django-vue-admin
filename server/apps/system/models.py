@@ -204,7 +204,7 @@ class CommonBModel(SoftModel):
         abstract = True
 
 
-class File(CommonAModel):
+class File(CommonBModel):
     """
     文件存储表,业务表根据具体情况选择是否外键关联
     """
