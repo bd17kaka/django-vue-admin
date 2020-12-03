@@ -24,7 +24,7 @@
         <template slot-scope="scope">
           <el-link
             type="primary"
-            :href="'http://localhost:8000/media/'+scope.row.dataset_name+'.zip'"
+            :href="downloadurl+'/media/'+scope.row.dataset_name+'.zip'"
             target="_blank">
             {{ scope.row.dataset_name }}
           </el-link>
@@ -76,13 +76,13 @@
       </el-table-column>
     </el-table>
 
-    <el-dialog :visible.sync="dialogTableVisible" title="数据集详细信息">
+    <el-dialog :visible.sync="dialogTableVisible" title="数据集详细信息" width="80%">
         <el-table :data="datasetshowList" border>
-            <el-table-column property="dataset_name" label="数据集名称" width="120"></el-table-column>
-            <el-table-column property="create_time" label="创建日期" width="180"></el-table-column>
-            <el-table-column property="update_time" label="修改日期" width="180"></el-table-column>
-            <el-table-column property="description" label="数据集描述" width="200"></el-table-column>
-            <el-table-column property="addr" label="数据集地址" width="250"></el-table-column>
+            <el-table-column property="dataset_name" label="数据集名称"></el-table-column>
+            <el-table-column property="create_time" label="创建日期"></el-table-column>
+            <el-table-column property="update_time" label="修改日期"></el-table-column>
+            <el-table-column property="description" label="数据集描述"></el-table-column>
+            <el-table-column property="addr" label="数据集地址"></el-table-column>
         </el-table>
     </el-dialog>
 
@@ -169,6 +169,7 @@ export default {
         description: '',
         addr: ''
       }],
+      downloadurl: process.env.VUE_APP_BASE_API,
       upHeaders: upHeaders(),
       upUrl: upUrl(),
       datasetList: {count:0},

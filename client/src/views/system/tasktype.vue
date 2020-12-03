@@ -29,45 +29,45 @@
        <el-table-column prop="update_time" label="修改时间" align="center" min-width="100"></el-table-column>
        <el-table-column label="操作" align="center" min-width="100">
          <template slot-scope="scope">
-          <el-button 
-          type="info" 
-          size="small" 
-          icon="el-icon-view" 
+          <el-button
+          type="info"
+          size="small"
+          icon="el-icon-view"
           title="查看详细信息"
-          :disabled="!checkPermission(['tasktype_query'])" 
+          :disabled="!checkPermission(['tasktype_query'])"
           @click="checkDetail(scope.row)" />
-          <el-button 
-          type="primary" 
-          size="small" 
-          icon="el-icon-edit" 
+          <el-button
+          type="primary"
+          size="small"
+          icon="el-icon-edit"
           title="编辑"
-          :disabled="!checkPermission(['tasktype_update'])" 
+          :disabled="!checkPermission(['tasktype_update'])"
           @click="handleEdit(scope)" />
-          <el-button 
-          type="danger" 
-          size="small" 
-          icon="el-icon-delete" 
+          <el-button
+          type="danger"
+          size="small"
+          icon="el-icon-delete"
           title="删除"
-          :disabled="!checkPermission(['tasktype_delete'])" 
+          :disabled="!checkPermission(['tasktype_delete'])"
           @click="handleDelete(scope)" />
          </template>
        </el-table-column>
   </el-table>
-  
-  <!-- 
-    查看详情-对话框 
+
+  <!--
+    查看详情-对话框
     -->
-  <el-dialog :visible.sync="dialogTableVisible" title="任务类型详细信息">
-        <el-table :data="present_row"> 
-            <el-table-column property="tasktype_name" label="任务类型名称" width="150" ></el-table-column>
-            <el-table-column property="tasktype_description" label="任务类型描述" width="280" ></el-table-column>
-            <el-table-column property="create_time" label="创建时间" width="200" ></el-table-column>
-            <el-table-column property="update_time" label="修改时间" width="200" ></el-table-column>
+  <el-dialog :visible.sync="dialogTableVisible" title="任务类型详细信息" width="80%">
+        <el-table :data="present_row">
+            <el-table-column property="tasktype_name" label="任务类型名称"></el-table-column>
+            <el-table-column property="tasktype_description" label="任务类型描述"></el-table-column>
+            <el-table-column property="create_time" label="创建时间"></el-table-column>
+            <el-table-column property="update_time" label="修改时间"></el-table-column>
         </el-table>
   </el-dialog>
 
-  <!-- 
-    新建任务类型-对话框 
+  <!--
+    新建任务类型-对话框
     -->
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑岗位':'新建任务类型'">
       <el-form

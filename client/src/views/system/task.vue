@@ -80,13 +80,13 @@
 
     <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
         <el-table :data="taskshowList" border>
-            <el-table-column property="task_name" label="任务名称" width="120"></el-table-column>
-            <el-table-column property="task_type" label="任务类型" width="120"></el-table-column>
-            <el-table-column property="create_time" label="创建日期" width="180"></el-table-column>
-            <el-table-column property="update_time" label="修改日期" width="180"></el-table-column>
-            <el-table-column property="matched_dataset" label="数据集" width="120"></el-table-column>
-            <el-table-column property="task_measurement" label="评价指标" width="120"></el-table-column>
-            <el-table-column property="description" label="任务描述" width="200"></el-table-column>
+            <el-table-column property="task_name" label="任务名称"></el-table-column>
+            <el-table-column property="task_type" label="任务类型"></el-table-column>
+            <el-table-column property="create_time" label="创建日期"></el-table-column>
+            <el-table-column property="update_time" label="修改日期"></el-table-column>
+            <el-table-column property="matched_dataset" label="数据集"></el-table-column>
+            <el-table-column property="task_measurement" label="评价指标"></el-table-column>
+            <el-table-column property="description" label="任务描述"></el-table-column>
 <!--            <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>-->
         </el-table>
     </el-dialog>
@@ -299,7 +299,7 @@ export default {
         if (this.solution[k].taskName == scope.row.task_name) {
           var username_temp = ''
           for (var j = 0; j < this.user.length; j++) {
-            if (this.user[j].id == this.solution[j].userId) {
+            if (this.user[j].id == this.solution[k].userId) {
               username_temp = this.user[j].username
               break
             }
