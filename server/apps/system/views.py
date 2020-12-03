@@ -298,10 +298,8 @@ class UserViewSet(ModelViewSet):
                 tempDict["dept"]=None
                 tempDict["avatar"]='/media/default/avatar.png'
                 tempDict["dept"]=request.data['dept']
-                #temp = []
-                #temp.append(request.data['roles'])
-                #tempDict["roles"]=temp
-                tempDict["role"] = request.data['roles']
+                tempDict["roles"] = request.data['roles']
+                print(tempDict)
                 password = make_password('0000')
                 serializer = self.get_serializer(data = tempDict)
                 serializer.is_valid(raise_exception=True)
