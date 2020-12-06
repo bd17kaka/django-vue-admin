@@ -1,5 +1,5 @@
 from django.urls import path, include
-from .views import UserViewSet, OrganizationViewSet, PermissionViewSet, RoleViewSet, PositionViewSet, TestView, DictTypeViewSet, DictViewSet, TaskViewSet, MeasurementViewSet, DatasetViewSet, SolutionViewSet, TasktypeViewSet
+from .views import UserViewSet, OrganizationViewSet, PermissionViewSet, RoleViewSet, PositionViewSet, TestView, DictTypeViewSet, DictViewSet, TaskViewSet, MeasurementViewSet, DatasetViewSet, SolutionViewSet, TasktypeViewSet, Download
 from rest_framework import routers
 
 
@@ -19,5 +19,5 @@ router.register('tasktype', TasktypeViewSet, basename="tasktype")
 urlpatterns = [
     path('', include(router.urls)),
     path('test/', TestView.as_view()),
-
+    path('download/<filename>', Download)
 ]

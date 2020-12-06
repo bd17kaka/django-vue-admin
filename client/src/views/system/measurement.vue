@@ -60,7 +60,7 @@
       <el-form
         ref="Table"
         :model="measurement"
-        label-width="100px"
+        label-width="120px"
         label-position="right"
         :rules="rule1"
       >

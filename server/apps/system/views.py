@@ -8,9 +8,11 @@ import time
 import winrm
 import json
 import numpy as np
+from .downloadSolution import folder2zip
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
+from django.http import HttpResponseRedirect
 from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
 from django_filters.rest_framework import DjangoFilterBackend
@@ -521,3 +523,10 @@ class TasktypeViewSet(ModelViewSet):
     search_fields = ['tasktype_name','tasktype_description']
     ordering_fields = ['pk']
     ordering = ['pk']
+
+def Download(request,filename):
+    print('test')
+    print(filename)
+    folder2zip('D:\papers','D:\codes\django-vue-admin\server\media')
+    print("打包完毕")
+    return HttpResponseRedirect("http://localhost:8000/media/"+filename+".zip")
