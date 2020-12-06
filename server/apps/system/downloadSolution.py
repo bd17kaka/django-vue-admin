@@ -36,5 +36,6 @@ def folder2zip(folder,goalFolder):                               #文件夹打�
         myOwnZip(zfile,folder)
         zfile.close()
         shutil.move(zipfile_name, os.path.join(goalFolder, zipfile_name))
-
+    print("压缩后文件名:",zipfile_name)
+    print("目标文件路径:",zipfile_name)
 # folder2zip("C:/Users/10073\Desktop/knn","D:/")
