@@ -74,7 +74,7 @@
             @click="handleDelete(scope)"
             title="删除"
           />
-          <a :href="'http://localhost:8000/system/download/' + scope.row.task_name" target="_blank">
+          <a :href="'http://10.201.200.222/system/download/' + scope.row.task_name" target="_blank">
           <el-button
             type="success"
             size="small"

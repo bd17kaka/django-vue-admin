@@ -528,6 +528,7 @@ class TasktypeViewSet(ModelViewSet):
 def Download(request,filename):
     print('test')
     print(filename)
-    folder2zip('D:\papers','D:\codes\django-vue-admin\server\media')
+    folder2zip(os.path.join(system_settings.originToBeZippedFolder,filename), system_settings.originToBeZippedFolder)
     print("打包完毕")
-    return HttpResponseRedirect("http://localhost:8000/media/"+filename+".zip")
+    # return HttpResponseRedirect("http://localhost:8000/media/"+filename+".zip")
+    return HttpResponseRedirect(system_settings.ip+"media/"+filename+".zip")
