@@ -9,6 +9,7 @@ import winrm
 import json
 import numpy as np
 from .downloadSolution import folder2zip
+from . import system_settings
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
@@ -365,9 +366,9 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
     def sendFile(self,hereFilePath,thereFilePath):
         hostname="10.201.147.111"
         # username = "ADMIN"
-        username="dell"
-        password = "2019202210088"
-        port = 22
+        username = system_settings.username
+        password = system_settings.password
+        port = system_settings.port
         transport = paramiko.Transport((hostname, port))  # 建立远程连接
         transport.connect(username=username, password=password)
         sftp = paramiko.SFTPClient.from_transport(transport)
@@ -433,10 +434,10 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
             shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
             # os.remove(os.path.name)
             if 'dataset' in name:
-                hostname="10.201.147.111"
-                username="dell"
-                password = "2019202210088"
-                port = 22
+                hostname=system_settings.hostname
+                username=system_settings.username
+                password = system_settings.password
+                port = system_settings.port
                 #self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
                 self.sendFile('/proj/django-vue-admin/server/' + instance.path, "D:/"+file_name)
                 server_obj = ServerByPara("python D:/unzip.py "+"D:/"+file_name+" D:/data/"+file_name.replace('.zip',''), hostname, username, password, "windows")
