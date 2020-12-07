@@ -32,9 +32,6 @@
           <span>{{ scope.row.create_time }}</span>
         </template>
       </el-table-column>
-      <el-table-column align="center" label="部门id（批量注册时用）" width="175">
-       <template slot-scope="scope">{{ scope.row.id }}</template>
-      </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button

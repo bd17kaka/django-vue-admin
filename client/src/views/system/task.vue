@@ -79,6 +79,7 @@
             type="success"
             size="small"
             icon="el-icon-download"
+            title="批量下载此任务下所有方案"
           />
           </a>
         </template>
@@ -138,12 +139,12 @@
           </el-select>
         </el-form-item>
         <el-form-item label="评价指标" prop="task_measurement">
-          <el-select v-model ="task.task_measurement" placeholder="请选择评价指标" style = "width:100%">
+          <el-select v-model ="task.task_measurement" multiple placeholder="请选择评价指标" style = "width:100%">
             <el-option
             v-for="item in measurement"
-            :key="item.id"
+            :key="item.value"
             :label="item.label"
-            :value="item.name"
+            :value="item.value"
             />
           </el-select>
         </el-form-item>

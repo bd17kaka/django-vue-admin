@@ -24,9 +24,6 @@
       <el-table-column align="header-center" label="角色描述">
         <template slot-scope="scope">{{ scope.row.description }}</template>
       </el-table-column>
-      <el-table-column align="center" label="角色id（批量注册时用）" width="180">
-        <template slot-scope="scope">{{ scope.row.id }}</template>
-      </el-table-column>
       <el-table-column align="center" label="操作">
         <template slot-scope="scope">
           <el-button type="primary" size="small" icon="el-icon-edit" @click="handleEdit(scope)" />

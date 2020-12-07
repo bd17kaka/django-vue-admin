@@ -58,13 +58,13 @@
       </el-table-column>
     </el-table>
     <el-dialog :visible.sync="dialogTableVisible" title="方案详细信息" width="80%">
-        <el-table :data="solutionShowList" border>
-            <el-table-column property="userName" label="用户名"></el-table-column>
-            <el-table-column property="solutionName" label="方案名称"></el-table-column>
-            <el-table-column property="taskName" label="任务名称"></el-table-column>
-            <el-table-column property="solutionResult" label="方案结果"></el-table-column>
-          <el-table-column property="solution_status" label="方案状态"></el-table-column>
-        </el-table>
+      <el-table :data="solutionShowList" border>
+        <el-table-column property="userName" label="用户名"></el-table-column>
+        <el-table-column property="solutionName" label="方案名称"></el-table-column>
+        <el-table-column property="taskName" label="任务名称"></el-table-column>
+        <el-table-column property="solutionResult" label="方案结果"></el-table-column>
+        <el-table-column property="solution_status" :formatter="stateFormat" label="方案状态"></el-table-column>
+      </el-table>
     </el-dialog>
 
 
@@ -182,6 +182,7 @@ export default {
     }
   },
   computed: {},
+  stateFormat: {},
   created() {
     this.getList()
     this.getTaskAll()
@@ -285,6 +286,7 @@ export default {
           console.error(err)
         })
     },
+
     async confirm(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
@@ -314,7 +316,10 @@ export default {
           return false
         }
       })
-    }
+    },
+    stateFormat(row,column) {
+      return row.solution_status === 0 ? '未运行' : row.solution_status === 1 ? '运行中' : '运行完毕'
+    },
   }
 }
 </script>
