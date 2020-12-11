@@ -364,7 +364,7 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
     search_fields = ['name']
     ordering = ['-create_time']
     def sendFile(self,hereFilePath,thereFilePath):
-        hostname="10.201.147.111"
+        hostname = system_settings.hostname
         # username = "ADMIN"
         username = system_settings.username
         password = system_settings.password
