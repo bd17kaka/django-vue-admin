@@ -74,7 +74,7 @@
             @click="handleDelete(scope)"
             title="删除"
           />
-          <a :href="process.env.VUE_APP_BASE_API + '/system/download/' + scope.row.task_name" target="_blank">
+          <a :href="downloadurl + '/system/download/' + scope.row.task_name" target="_blank">
           <el-button
             type="success"
             size="small"
@@ -198,6 +198,7 @@ export default {
       },
       search: '',
       tableData: [],
+      downloadurl: process.env.VUE_APP_BASE_API,
       taskList:  {count:0},
       listQuery: {
         page: 1,
