@@ -265,9 +265,10 @@ class Task(BaseModel):
 
     # status_type_choices = ((0, 0),(1, 1))
     task_name = models.CharField('任务名称', max_length=100, unique=True)
-    task_type = models.CharField('任务类型', max_length=100)
-    task_measurement = models.ManyToManyField(Measurement, blank=True, verbose_name='评价指标')
-    matched_dataset = models.CharField('数据集', max_length=100)
+    #task_type = models.CharField('任务类型', max_length=100)
+    task_type_id = models.IntegerField('任务类型id')
+    #task_measurement = models.ManyToManyField(Measurement, blank=True, verbose_name='评价指标')
+    #matched_dataset = models.CharField('数据集', max_length=100)
     description = models.TextField('描述', null=True)
     task_status = models.IntegerField('任务状态', default=0)
 
@@ -281,11 +282,12 @@ class Task(BaseModel):
 
 
 class Solution(CommonBModel):
-    solutionId = models.AutoField('ID', primary_key=True)
+    # solutionId = models.AutoField('ID', primary_key=True)
     solutionName = models.CharField('方案名称', max_length=50)
-    taskName = models.CharField('所属任务', max_length=200)
+    # taskName = models.CharField('所属任务', max_length=200)
+    task_id = models.IntegerField('任务id')
     userId = models.BigIntegerField('所属用户id', null=True)
-    solutionResult = models.CharField('运行结果', max_length=100, null=True)
+    #solutionResult = models.CharField('运行结果', max_length=100, null=True)
     solution_status = models.IntegerField('任务状态', default=0)
 
 
@@ -313,3 +315,48 @@ class Tasktype(BaseModel):
 
     def __str__(self):
         return self.tasktype_name
+
+class task_type_measument(BaseModel):
+    '''
+    任务类型-评价指标匹配表
+    '''
+    task_type_id = models.IntegerField('任务类型id')
+    dataset_id = models.IntegerField('评价指标id')
+
+    class Meta:
+        verbose_name = '任务类型-评价指标匹配'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return (self.task_type_id, self.dataset_id)
+
+class task_dataset_measurement(BaseModel):
+    '''
+    任务-数据集-评价指标匹配表
+    '''
+    task_id = models.IntegerField('任务id')
+    dataset_id = models.IntegerField('数据集id')
+    measurement_id = models.IntegerField('评价指标id')
+
+    class Meta:
+        verbose_name = '任务-数据集-评价指标匹配表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return (self.task_id, self.dataset_id, self.measurement_id)
+
+class solution_result(BaseModel):
+    '''
+    方案-数据集-评价指标结果表
+    '''
+    solution_id = models.IntegerField('方案id')
+    dataset_id = models.IntegerField('数据集id')
+    measurement_id = models.IntegerField('评价指标id')
+    solution_result = models.CharField('运行结果', max_length = 500, null = True)
+
+    class Meta:
+        verbose_name = '方案-数据集-评价指标结果表'
+        verbose_name_plural = verbose_name
+
+    def __str__(self):
+        return (self.solution_id, self.dataset_id, self.measurement_id, self.solution_result)
