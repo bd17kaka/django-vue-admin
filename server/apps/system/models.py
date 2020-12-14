@@ -321,14 +321,14 @@ class task_type_measument(BaseModel):
     任务类型-评价指标匹配表
     '''
     task_type_id = models.IntegerField('任务类型id')
-    dataset_id = models.IntegerField('评价指标id')
+    measurement_id = models.IntegerField('评价指标id')
 
     class Meta:
         verbose_name = '任务类型-评价指标匹配'
         verbose_name_plural = verbose_name
 
     def __str__(self):
-        return (self.task_type_id, self.dataset_id)
+        return (self.task_type_id, self.measurement_id)
 
 class task_dataset_measurement(BaseModel):
     '''
