@@ -24,9 +24,9 @@
         <template slot-scope="scope">{{ scope.row.task_name }}</template>
       </el-table-column>
 
-<!--      <el-table-column label="任务类型">-->
-<!--        <template slot-scope="scope">{{ scope.row.task_type }}</template>-->
-<!--      </el-table-column>-->
+     <el-table-column label="任务类型">
+       <template slot-scope="scope">{{ scope.row.tasktype_name }}</template>
+     </el-table-column>
 
       <el-table-column label="创建日期">
         <template slot-scope="scope">
@@ -89,7 +89,7 @@
     <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
         <el-table :data="taskshowList" border>
             <el-table-column property="task_name" label="任务名称"></el-table-column>
-            <el-table-column property="task_type" label="任务类型"></el-table-column>
+            <el-table-column prop="task_type_id" label="任务类型" :formatter="formatterTasktype"></el-table-column>
             <el-table-column property="create_time" label="创建日期"></el-table-column>
             <el-table-column property="update_time" label="修改日期"></el-table-column>
             <el-table-column property="matched_dataset" label="数据集"></el-table-column>
@@ -118,23 +118,23 @@
             <el-form-item label="任务名称" prop="task_name">
           <el-input v-model="task.task_name" placeholder="任务名称" />
         </el-form-item>
-        <el-form-item label="任务类型" prop="task_type">
-          <el-select v-model="task.task_type" placeholder="请选择任务类型" style="width:100%">
+        <el-form-item label="任务类型" prop="task_type_id">
+          <el-select v-model="task.task_type_id"  placeholder="请选择任务类型" style="width:100%">
            <el-option
             v-for="item in tasktype"
              :key="item.id"
-             :label="item.label"
-             :value="item.tasktype_name"
+             :label="item.tasktype_name"
+             :value="item.id"
            />
           </el-select>
         </el-form-item>
         <el-form-item label="数据集" prop="matched_dataset">
-          <el-select v-model ="task.matched_dataset" placeholder="请选择数据集" style = "width:100%">
+          <el-select v-model ="task.matched_dataset" multiple placeholder="请选择数据集" style = "width:100%">
             <el-option
             v-for="item in dataset"
             :key="item.id"
-            :label="item.label"
-            :value="item.dataset_name"
+            :label="item.dataset_name"
+            :value="item.id"
             />
           </el-select>
         </el-form-item>
@@ -213,13 +213,14 @@ export default {
       taskshowList: [{
         id: '',
         task_name: '',
-        task_type: '',
+        task_type_id: '',
+        task_type_name: '',
         create_time: '',
         update_time: '',
         matched_dataset: '',
         task_measurement: '',
         description: '',
-        task_status: ''
+        task_status: '',
       }],
       listLoading: true,
       dialogFormVisible: false,
@@ -228,13 +229,14 @@ export default {
       dialogType: 'new',
       rule1: {
         task_name: [{ required: true, message: '请输入名称', trigger: 'blur' }],
-        task_type: [{ required: true, message: '请选择任务类型', trigger: 'blur' }],
+        task_type_id: [{ required: true, message: '请选择任务类型', trigger: 'blur' }],
         matched_dataset: [{ required: true, message: '请选择数据集', trigger: 'blur' }],
         task_measurement: [{ required: true, message: '请选择评价指标', trigger: 'blur' }],
       },
     }
   },
   computed: {},
+  formatterTasktype: {},
   created() {
     this.getList();
     this.getTasktypeAll()
@@ -249,10 +251,30 @@ export default {
       this.listLoading = true;
       getTaskList(this.listQuery).then(response => {
         if (response.data) {
-          this.taskList = response.data        }
+          this.taskList = response.data        
+        }
+        console.log(11111111111111111111111)
+        console.log(this.taskList)
+        for (var i = 0; i < this.taskList.results.length; i++) {
+          for (var j = 0; j < this.tasktype.length; j++) {
+            if (this.tasktype[j].id == this.taskList.results[i].task_type_id) {
+              this.taskList.results[i]["tasktype_name"] = this.tasktype[j].tasktype_name
+              break
+            }
+          }
+        }
+        console.log(this.taskList.results)
         this.listLoading = false;
       });
     },
+    getMeasurement:function (id) {
+      console.log(this.tasktype)
+      console.log(id)
+        // var citys=this.areas.filter(function (city) {
+        //   return city.pid == id;
+        // })
+        // this.citys = citys;
+      },
     resetFilter() {
       this.listQuery = {
         page: 1,
@@ -267,6 +289,9 @@ export default {
     getTasktypeAll() {
       getTasktypeAll().then(response => {
         this.tasktype = genTree(response.data.results);
+        console.log("a")
+        console.log(response.data.results)
+        console.log("a")
       });
     },
     getDatasetAll() {
@@ -293,8 +318,17 @@ export default {
     },
     handleShow(scope) {
       this.taskshowList[0].id = scope.row.id
-      this.taskshowList[0].task_name = scope.row.task_name
-      this.taskshowList[0].task_type = scope.row.task_type
+      // this.taskshowList[0].task_name = scope.row.task_name
+      // this.taskshowList[0].task_type = scope.row.task_type
+      this.taskshowList[0].task_type_id = scope.row.task_type_id
+      // for (var k = 0; k < this.tasktype.length; k++) {
+      //   if (this.tasktype[k].id == scope.row.task_type_id) {
+      //     this.taskshowList[0].task_type_name = this.tasktype[k].tasktype_name
+      //     break
+      //   }
+      // }
+      // console.log("123")
+      // console.log(this.taskshowList[0].task_tpye_id)
       this.taskshowList[0].create_time = scope.row.create_time
       this.taskshowList[0].update_time = scope.row.update_time
       this.taskshowList[0].matched_dataset = scope.row.matched_dataset
@@ -354,6 +388,14 @@ export default {
         .catch(err => {
           console.error(err)
         })
+    },
+    formatTasktype(row,column){
+      console.log(this.tasktype);
+      for (var i = 0; i < this.tasktype.length; i++) {
+        if (this.tasktype[i].id == Number(row.task_type_id)) {
+          return this.tasktype[i].tasktype_name;
+        }
+      }
     },
     async confirm(form) {
       this.$refs[form].validate(valid => {

@@ -2,6 +2,7 @@ import logging
 import os
 import pandas as pd
 import shutil
+import pymysql
 
 import paramiko
 import time
@@ -33,18 +34,21 @@ from rest_framework.viewsets import GenericViewSet, ModelViewSet
 from rest_framework_simplejwt.tokens import RefreshToken
 
 from utils.queryset import get_child_queryset2
+import urllib.request
 
 from .filters import UserFilter
 from .mixins import CreateUpdateModelAMixin, CreateUpdateModelBMixin
 from .models import (Dict, DictType, File, Organization, Permission, Position,
-                     Role, User, Measurement, Task, Dataset, Solution, Tasktype)
+                     Role, User, Measurement, Task, Dataset, Solution, Tasktype,
+                     task_type_measument, task_dataset_measurement, solution_result)
 from .permission import RbacPermission, get_permission_list
 from .permission_data import RbacFilterSet
 from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           OrganizationSerializer, PermissionSerializer,
                           PositionSerializer, RoleSerializer, TaskSerializer,
                           UserCreateSerializer, UserListSerializer,
-                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer)
+                          UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer,
+                          task_type_measurementSerializer, task_dataset_measurementSerializer, solution_resultSerializer)
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -276,6 +280,7 @@ class UserViewSet(ModelViewSet):
                 password = make_password(password)
             else:
                 password = make_password('0000')
+            
             serializer = self.get_serializer(data=request.data)
             serializer.is_valid(raise_exception=True)
             instance = serializer.save(password=password)
@@ -476,6 +481,57 @@ class TaskViewSet(ModelViewSet):
     ordering_fields = ['pk']
     ordering = ['pk']
 
+    def get_task_id(self,task_name):
+        '''
+        获取任务id
+        '''
+        conn = pymysql.connect(host=system_settings.mysql_host, port=system_settings.mysql_port, 
+        user=system_settings.mysql_user, password=system_settings.mysql_password, db='aishare', charset='utf8')
+        cur = conn.cursor()
+        print("连接成功")
+        sql="select id from system_task where task_name='%s'" %(task_name)
+        print("查询命令为:",sql)
+        cur.execute(sql)
+        result = cur.fetchall()
+        print("查询结果为:",result)
+        cur.close()
+        conn.close()
+        return result[0][0]
+    #sql="insert into student_info(stuname,classno,id,coursename,scores) values('%s','%s',%d,'%s',%d)" %valueTuple
+    def create(self, request, *args, **kwargs):
+        print(*args, "  ", **kwargs)
+        print(type(request),request)
+        serializer = self.get_serializer(data=request.data)
+        # print("类型：",type(request.data))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+        # {'id': '', 'task_name': 'test3', 'task_measurement': [1], 
+        # 'task_type_id': 1, 'matched_dataset': 1, 
+        # 'description': '123'}
+        print(request.data)
+        task_id = self.get_task_id(request.data["task_name"])
+        for dataset_temp in request.data["matched_dataset"]:
+            #print(dataset_temp)
+            for measurement_temp in request.data["task_measurement"]:
+                #print(measurement_temp)
+                # to_be_stored_data['dataset_id']=dataset_temp
+                # to_be_stored_data['measurement_id']=measurement_temp
+                # print(to_be_stored_data)
+                t_d_mea_obj = task_dataset_measurement.objects.create(task_id = task_id, dataset_id = dataset_temp,
+                measurement_id = measurement_temp)
+                # self.t_d_mea = task_dataset_measurementViewSet()
+                # self.t_d_mea.create(request=to_be_stored_data)
+                # self.t_d_mea_serializer = self.t_d_mea.get_serializer(data=to_be_stored_data)
+                # self.t_d_mea_serializer.is_valid(raise_exception=True)
+                # self.t_d_mea.perform_create(self.t_d_mea_serializer)
+                print("多表保存成功")
+       
+        
+        
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+    # def perform_create():
 
 class DatasetViewSet(ModelViewSet):
     '''
@@ -522,6 +578,30 @@ class TasktypeViewSet(ModelViewSet):
     serializer_class = TasktypeSerializer
 #   pagination_class = None
     search_fields = ['tasktype_name','tasktype_description']
+    ordering_fields = ['pk']
+    ordering = ['pk']
+
+class task_type_measurementViewSet(ModelViewSet):
+    search_fields = ["id"]
+    ordering_fields = ['pk']
+    ordering = ['pk']
+
+class task_dataset_measurementViewSet(ModelViewSet):
+    queryset = task_dataset_measurement.objects.all()
+    serializer_class = task_dataset_measurementSerializer
+    search_fields = ["id"]
+    ordering_fields = ['pk']
+    ordering = ['pk']
+    def create(self, request, *args, **kwargs):
+        #print(type(request),request)
+        serializer = self.get_serializer(data=request)
+        # print("类型：",type(request.data))
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+
+
+class solution_resultViewSet(ModelViewSet):
+    search_fields = ["id"]
     ordering_fields = ['pk']
     ordering = ['pk']
 
