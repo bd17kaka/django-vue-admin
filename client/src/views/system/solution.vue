@@ -59,9 +59,9 @@
     </el-table>
     <el-dialog :visible.sync="dialogTableVisible" title="方案详细信息" width="80%">
       <el-table :data="solutionShowList" border>
-        <el-table-column property="userName" label="用户名"></el-table-column>
+        <el-table-column prop="create_by" label="用户名" :formatter="formatUser"></el-table-column>
         <el-table-column property="solutionName" label="方案名称"></el-table-column>
-        <el-table-column property="taskName" label="任务名称"></el-table-column>
+        <el-table-column prop="task_id" label="任务名称" :formatter="formatTask"></el-table-column>
         <el-table-column property="solutionResult" label="方案结果"></el-table-column>
         <el-table-column property="solution_status" :formatter="stateFormat" label="方案状态"></el-table-column>
       </el-table>
@@ -77,17 +77,15 @@
         :rules="rule1"
       >
         <el-form-item label="任务名称" prop="taskName">
-
           <el-select v-model="solution.taskName" placeholder="请选择任务名称" style="width:100%">
             <el-option
-            v-for="item in taskList"
-             :key="item.id"
-             :label="item.label"
-             :value="item.task_name"
-           />
+              v-for="item in taskList"
+              :key="item.id"
+              :label="item.label"
+              :value="item.task_name"
+            />
           </el-select>
         </el-form-item>
-
         <el-form-item label="上传方案">
           <el-upload
             ref="upload"
@@ -98,11 +96,10 @@
             :headers="upHeaders"
             :on-success="UploadSuccess"
           >
-          <el-button size="small" type="primary">点击上传</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传zip文件</div>
+            <el-button size="small" type="primary">点击上传</el-button>
+            <div slot="tip" class="el-upload__tip">只能上传zip文件</div>
           </el-upload>
         </el-form-item>
-
         <el-form-item label="方案名称" prop="solutionName">
           <el-input v-model="solution.solutionName" :disabled="true" placeholder="方案名称" />
         </el-form-item>
@@ -126,18 +123,16 @@
 <script>
 import {
   getSolutionList,
-  getSolutionAll,
   createSolution,
   deleteSolution,
   updateSolution
 } from '@/api/solution'
-import { genTree, deepClone } from '@/utils'
+import { genTree } from '@/utils'
 import checkPermission from '@/utils/permission'
-import {getTaskAll} from "@/api/task";
-import {upHeaders, upUrl} from "@/api/file";
-import Pagination from "@/components/Pagination"
-import {getInfo, getUserAll} from "@/api/user";
-
+import { getTaskAll } from '@/api/task'
+import { upHeaders, upUrl } from '@/api/file'
+import Pagination from '@/components/Pagination'
+import { getInfo, getUserAll } from '@/api/user'
 
 const defaultM = {
   id: '',
@@ -153,16 +148,18 @@ export default {
         id: '',
         solutionName: '',
         taskName: '',
-        userId: ''
+        task_id: ''
       },
       search: '',
       tableData: [],
-      solutionList: {count:0},
+      solutionList: { count: 0 },
       solutionShowList: [{
         id: '',
         solutionName: '',
         taskName: '',
+        task_id: '',
         userName: '',
+        create_by: '',
         solutionResult: '',
         solution_status: ''
       }],
@@ -170,7 +167,7 @@ export default {
         page: 1,
         page_size: 20
       },
-      taskList:[],
+      taskList: [],
       user: [],
       listLoading: true,
       dialogFormVisible: false,
@@ -190,57 +187,59 @@ export default {
   },
   methods: {
     checkPermission,
-    UploadSuccess(res,file) {
-      var str=res.data.name;
-      this.solution.solutionName=str.substr(0,str.length -4);
+    UploadSuccess(res, file) {
+      var str = res.data.name
+      this.solution.solutionName = str.substr(0, str.length - 4)
     },
-    beforeUpload(file) {                //返回fasle停止上传,检查压缩包名称和格式
-      const isZip = file.name.endsWith('.zip');
-      if(!isZip){
-        this.$message.error('请选择zip文件！');
-        return false;
-      }
-      else return true;
+    beforeUpload(file) {
+      const isZip = file.name.endsWith('.zip')
+      if (!isZip) {
+        this.$message.error('请选择zip文件！')
+        return false
+      } else return true
     },
     getTaskAll() {
       getTaskAll().then(response => {
-        this.taskList = genTree(response.data.results);
-      });
+        this.taskList = genTree(response.data.results)
+      })
     },
     getUserAll() {
       getUserAll().then(response => {
-        this.user = genTree(response.data.results);
-      });
+        this.user = genTree(response.data.results)
+      })
     },
     getList() {
-      this.listLoading = true;
+      this.listLoading = true
       getSolutionList(this.listQuery).then(response => {
         if (response.data) {
           this.solutionList = response.data
         }
-        this.listLoading = false;
-      });
+        for (var i = 0; i < this.solutionList.results.length; i++) {
+          for (var j = 0; j < this.taskList.length; j++) {
+            if (this.taskList[j].id == this.solutionList.results[i].task_id) {
+              this.solutionList.results[i]['taskName'] = this.taskList[j].task_name
+              break
+            }
+          }
+        }
+        this.listLoading = false
+      })
     },
     resetFilter() {
       this.listQuery = {
         page: 1,
         page_size: 20
-      };
-      this.getList();
+      }
+      this.getList()
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     handleShow(scope) {
-      // this.solutionShowList[0].id = scope.row.id
       this.solutionShowList[0].solutionName = scope.row.solutionName
-      this.solutionShowList[0].taskName = scope.row.taskName
-      for (var i = 0; i < this.user.length; i++) {
-        if (this.user[i].id == scope.row.userId) {
-          this.solutionShowList[0].userName = this.user[i].username
-        }
-      }
+      this.solutionShowList[0].task_id = scope.row.task_id
+      this.solutionShowList[0].create_by = scope.row.create_by
       this.solutionShowList[0].solutionResult = scope.row.solutionResult
       this.solutionShowList[0].solution_status = scope.row.solution_status
       this.dialogTableVisible = true
@@ -265,17 +264,13 @@ export default {
       })
     },
     handleDelete(scope) {
-      console.log(scope)
       this.$confirm('确认删除?', '警告', {
         confirmButtonText: '确认',
         cancelButtonText: '取消',
         type: 'error'
       })
         .then(async() => {
-          // console.log("这里")
-          // console.log(scope.row.solutionId)
-          await deleteSolution(scope.row.solutionId)
-          // console.log(scope.row.id)
+          await deleteSolution(scope.row.id)
           this.getList()
           this.$message({
             type: 'success',
@@ -286,19 +281,31 @@ export default {
           console.error(err)
         })
     },
-
+    formatUser(row, column) {
+      for (var i = 0; i < this.user.length; i++) {
+        if (this.user[i].id == Number(row.create_by)) {
+          return this.user[i].name
+        }
+      }
+    },
+    formatTask(row, column) {
+      for (var i = 0; i < this.taskList.length; i++) {
+        if (this.taskList[i].id == Number(row.task_id)) {
+          return this.taskList[i].task_name
+        }
+      }
+    },
     async confirm(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
           const isEdit = this.dialogType === 'edit'
           if (isEdit) {
-            // console.log(this.solution)
             updateSolution(this.solution.solutionId, this.solution).then(() => {
               this.getList()
               this.dialogFormVisible = false
               this.$message({
                 message: '编辑成功',
-                type: 'success',
+                type: 'success'
               })
             })
           } else {
@@ -308,7 +315,7 @@ export default {
               this.dialogFormVisible = false
               this.$message({
                 message: '新增成功',
-                type: 'success',
+                type: 'success'
               })
             })
           }
@@ -317,9 +324,9 @@ export default {
         }
       })
     },
-    stateFormat(row,column) {
+    stateFormat(row, column) {
       return row.solution_status === 0 ? '未运行' : row.solution_status === 1 ? '运行中' : '运行完毕'
-    },
+    }
   }
 }
 </script>
