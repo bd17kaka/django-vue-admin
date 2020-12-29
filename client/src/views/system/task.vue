@@ -89,7 +89,7 @@
     <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
         <el-table :data="taskshowList" border>
             <el-table-column property="task_name" label="任务名称"></el-table-column>
-            <el-table-column prop="task_type_id" label="任务类型" :formatter="formatterTasktype"></el-table-column>
+            <el-table-column prop="task_type_id" label="任务类型" :formatter="formatTasktype"></el-table-column>
             <el-table-column property="create_time" label="创建日期"></el-table-column>
             <el-table-column property="update_time" label="修改日期"></el-table-column>
             <el-table-column property="matched_dataset" label="数据集"></el-table-column>
@@ -119,7 +119,7 @@
           <el-input v-model="task.task_name" placeholder="任务名称" />
         </el-form-item>
         <el-form-item label="任务类型" prop="task_type_id">
-          <el-select v-model="task.task_type_id"  placeholder="请选择任务类型" style="width:100%">
+          <el-select v-model="task.task_type_id"  @change="changeMeasurement(task.task_type_id)" placeholder="请选择任务类型" style="width:100%">
            <el-option
             v-for="item in tasktype"
              :key="item.id"
@@ -141,9 +141,9 @@
         <el-form-item label="评价指标" prop="task_measurement">
           <el-select v-model ="task.task_measurement" multiple placeholder="请选择评价指标" style = "width:100%">
             <el-option
-            v-for="item in measurement"
+            v-for="item in temp_list"
             :key="item.value"
-            :label="item.label"
+            :label="item.measurement_name"
             :value="item.value"
             />
           </el-select>
@@ -178,7 +178,8 @@ import {
   getTaskAll,
   createTask,
   deleteTask,
-  updateTask
+  updateTask,
+  getTasktypeMeasurementAll
 } from '@/api/task'
 import { genTree, deepClone } from '@/utils'
 import checkPermission from '@/utils/permission'
@@ -206,6 +207,8 @@ export default {
       },
       tasktype: [],
       dataset: [],
+      t_m_list: [],
+      temp_list: [],
       user: [],
       solution: [],
       measurement: [],
@@ -244,6 +247,7 @@ export default {
     this.getMeasurementAll()
     this.getSolutionAll()
     this.getUserAll()
+    this.getTasktypeMeasurementAll()
   },
   methods: {
     checkPermission,
@@ -253,8 +257,6 @@ export default {
         if (response.data) {
           this.taskList = response.data        
         }
-        console.log(11111111111111111111111)
-        console.log(this.taskList)
         for (var i = 0; i < this.taskList.results.length; i++) {
           for (var j = 0; j < this.tasktype.length; j++) {
             if (this.tasktype[j].id == this.taskList.results[i].task_type_id) {
@@ -263,13 +265,13 @@ export default {
             }
           }
         }
-        console.log(this.taskList.results)
+        // console.log(this.taskList.results)
         this.listLoading = false;
       });
     },
     getMeasurement:function (id) {
-      console.log(this.tasktype)
-      console.log(id)
+      // console.log(this.tasktype)
+      // console.log(id)
         // var citys=this.areas.filter(function (city) {
         //   return city.pid == id;
         // })
@@ -289,9 +291,9 @@ export default {
     getTasktypeAll() {
       getTasktypeAll().then(response => {
         this.tasktype = genTree(response.data.results);
-        console.log("a")
-        console.log(response.data.results)
-        console.log("a")
+        // console.log("a")
+        // console.log(response.data.results)
+        // console.log("a")
       });
     },
     getDatasetAll() {
@@ -301,9 +303,9 @@ export default {
     },
     getSolutionAll() {
       getSolutionAll().then(response => {
-        console.log(response.data.results)
+        // console.log(response.data.results)
         this.solution = response.data.results
-        console.log(this.solution)
+        // console.log(this.solution)
       })
     },
     getUserAll() {
@@ -314,6 +316,13 @@ export default {
     getMeasurementAll() {
       getMeasurementAll().then(response => {
         this.measurement = genTree(response.data);
+      });
+    },
+    getTasktypeMeasurementAll() {
+      getTasktypeMeasurementAll().then(response => {
+        // console.log(response.data)
+        this.t_m_list = genTree(response.data.results);
+        // console.log(this.t_m_list);
       });
     },
     handleShow(scope) {
@@ -352,7 +361,7 @@ export default {
             solutionResult: this.solution[k].solutionResult })
         }
       }
-      console.log(this.solutionAllShowList)
+      // console.log(this.solutionAllShowList)
       this.dialogTableAllVisible = true
     },
     handleAdd() {
@@ -389,14 +398,35 @@ export default {
           console.error(err)
         })
     },
+    changeMeasurement(id){
+      this.temp_list = this.t_m_list.filter(function (x) {
+          return x.task_type_id == id
+        })
+      for (var i = 0; i < this.temp_list.length; ++i) {
+        for(var j = 0; j < this.measurement.length; ++j) {
+          if (this.measurement[j].id == this.temp_list[i].measurement_id) {
+            this.temp_list[i]["measurement_name"] = this.measurement[j].name;
+            break;
+          }
+        }
+      }
+    },
     formatTasktype(row,column){
-      console.log(this.tasktype);
       for (var i = 0; i < this.tasktype.length; i++) {
         if (this.tasktype[i].id == Number(row.task_type_id)) {
           return this.tasktype[i].tasktype_name;
         }
       }
     },
+    // formatMeasurement(row,column){
+    //   console.log("aaa");
+    //   console.log(this.task.task_measurement);
+    //   for (var i = 0; i < this.measurement.length; i++) {
+    //     if (this.measurement[i].id == Number(row.task_measurement)) {
+    //       return this.measurement[i].name;
+    //     }
+    //   }
+    // },
     async confirm(form) {
       this.$refs[form].validate(valid => {
         if (valid) {
@@ -416,7 +446,7 @@ export default {
               // this.tableData.unshift(this.task)
               this.getList()
               this.dialogFormVisible = false
-              console.log(this.task)
+              // console.log(this.task)
               this.$message({
                 message: '新增成功',
                 type: 'success',

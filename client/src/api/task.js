@@ -37,3 +37,10 @@ export function deleteTask(id) {
     method: 'delete'
   })
 }
+
+export function getTasktypeMeasurementAll() {
+  return request({
+    url: '/system/task_type_measurement/',
+    method: 'get'
+  })
+}

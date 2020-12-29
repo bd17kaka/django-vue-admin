@@ -582,6 +582,8 @@ class TasktypeViewSet(ModelViewSet):
     ordering = ['pk']
 
 class task_type_measurementViewSet(ModelViewSet):
+    queryset = task_type_measument.objects.all()
+    serializer_class = task_type_measurementSerializer
     search_fields = ["id"]
     ordering_fields = ['pk']
     ordering = ['pk']
