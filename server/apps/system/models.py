@@ -286,7 +286,7 @@ class Solution(CommonBModel):
     solutionName = models.CharField('方案名称', max_length=50)
     # taskName = models.CharField('所属任务', max_length=200)
     task_id = models.IntegerField('任务id')
-    userId = models.BigIntegerField('所属用户id', null=True)
+    # userId = models.BigIntegerField('所属用户id', null=True)
     #solutionResult = models.CharField('运行结果', max_length=100, null=True)
     solution_status = models.IntegerField('任务状态', default=0)
 
