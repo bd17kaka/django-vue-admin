@@ -44,3 +44,10 @@ export function getTasktypeMeasurementAll() {
     method: 'get'
   })
 }
+
+export function getDatasetMeasurementAll() {
+  return request({
+    url: '/system/task_dataset_measurement/',
+    method: 'get'
+  })
+}

@@ -497,7 +497,7 @@ class TaskViewSet(ModelViewSet):
         cur.close()
         conn.close()
         return result[0][0]
-    #sql="insert into student_info(stuname,classno,id,coursename,scores) values('%s','%s',%d,'%s',%d)" %valueTuple
+
     def create(self, request, *args, **kwargs):
         print(*args, "  ", **kwargs)
         print(type(request),request)
@@ -567,6 +567,36 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
     search_fields = ['solutionId','solutionName', 'taskName']
     ordering_fields = ['pk']
     ordering=['pk']
+    def get_solution_id(self,solutionName):
+        '''
+        获取方案id
+        '''
+        conn = pymysql.connect(host=system_settings.mysql_host, port=system_settings.mysql_port, 
+        user=system_settings.mysql_user, password=system_settings.mysql_password, db='aishare', charset='utf8')
+        cur = conn.cursor()
+        print("连接成功")
+        sql="select id from system_solution where solutionName='%s'" %(solutionName)
+        print("查询命令为:",sql)
+        cur.execute(sql)
+        result = cur.fetchall()
+        print("查询结果为:",result)
+        cur.close()
+        conn.close()
+        return result[0][0]
+
+    def create(self, request, *args, **kwargs):
+
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        solution_id = self.get_solution_id(request.data["solutionName"])
+        for dataset_temp in request.data["dataset_id"]:
+            for measurement_temp in request.data["measurement_id"]:
+                s_r_obj = solution_result.objects.create(solution_id = solution_id, dataset_id = dataset_temp,
+                measurement_id = measurement_temp)
+                print("多表保存成功")
+        headers = self.get_success_headers(serializer.data)
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class TasktypeViewSet(ModelViewSet):
     '''
@@ -603,6 +633,8 @@ class task_dataset_measurementViewSet(ModelViewSet):
 
 
 class solution_resultViewSet(ModelViewSet):
+    queryset = solution_result.objects.all()
+    serializer_class = solution_resultSerializer    
     search_fields = ["id"]
     ordering_fields = ['pk']
     ordering = ['pk']

@@ -76,13 +76,33 @@
         label-position="right"
         :rules="rule1"
       >
-        <el-form-item label="任务名称" prop="taskName">
-          <el-select v-model="solution.taskName" placeholder="请选择任务名称" style="width:100%">
+        <el-form-item label="任务名称" prop="task_id">
+          <el-select v-model="solution.task_id" @change="changeDatasetMeasurement(solution.task_id)" placeholder="请选择任务名称" style="width:100%">
             <el-option
               v-for="item in taskList"
               :key="item.id"
-              :label="item.label"
-              :value="item.task_name"
+              :label="item.task_name"
+              :value="item.id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="数据集" prop="dataset_id">
+          <el-select v-model="solution.dataset_id" multiple placeholder="请选择数据集" style="width:100%">
+            <el-option
+              v-for="item in temp_list1"
+              :key="item.dataset_id"
+              :label="item.dataset_name"
+              :value="item.dataset_id"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item label="评价指标" prop="measurement_id">
+          <el-select v-model="solution.measurement_id" multiple placeholder="请选择评价指标" style="width:100%">
+            <el-option
+              v-for="item in temp_list2"
+              :key="item.measurement_id"
+              :label="item.measurement_name"
+              :value="item.measurement_id"
             />
           </el-select>
         </el-form-item>
@@ -129,10 +149,12 @@ import {
 } from '@/api/solution'
 import { genTree } from '@/utils'
 import checkPermission from '@/utils/permission'
-import { getTaskAll } from '@/api/task'
+import { getTaskAll, getDatasetMeasurementAll} from '@/api/task'
 import { upHeaders, upUrl } from '@/api/file'
 import Pagination from '@/components/Pagination'
 import { getInfo, getUserAll } from '@/api/user'
+import {getDatasetAll} from '@/api/dataset'
+import {getMeasurementAll} from '@/api/measurement'
 
 const defaultM = {
   id: '',
@@ -148,7 +170,9 @@ export default {
         id: '',
         solutionName: '',
         taskName: '',
-        task_id: ''
+        task_id: '',
+        dataset_id: '',
+        measurement_id: ''
       },
       search: '',
       tableData: [],
@@ -169,6 +193,11 @@ export default {
       },
       taskList: [],
       user: [],
+      datasetList: [],
+      measurementList: [],
+      t_d_m_list: [],
+      temp_list1: [],
+      temp_list2: [],
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
@@ -184,6 +213,9 @@ export default {
     this.getList()
     this.getTaskAll()
     this.getUserAll()
+    this.getDatasetMeasurementAll()
+    this.getDatasetAll()
+    this.getMeasurementAll()
   },
   methods: {
     checkPermission,
@@ -203,10 +235,25 @@ export default {
         this.taskList = genTree(response.data.results)
       })
     },
+    getDatasetAll() {
+      getDatasetAll().then(response => {
+        this.datasetList = genTree(response.data.results)
+      })
+    },
+    getMeasurementAll() {
+      getMeasurementAll().then(response => {
+        this.measurementList = genTree(response.data)
+      })
+    },
     getUserAll() {
       getUserAll().then(response => {
         this.user = genTree(response.data.results)
       })
+    },
+    getDatasetMeasurementAll() {
+      getDatasetMeasurementAll().then(response => {
+        this.t_d_m_list = genTree(response.data.results);
+      });
     },
     getList() {
       this.listLoading = true
@@ -245,9 +292,9 @@ export default {
       this.dialogTableVisible = true
     },
     handleAdd() {
-      getInfo().then(response => {
-        this.solution.userId = response.data.id
-      })
+      // getInfo().then(response => {
+      //   this.solution.userId = response.data.id
+      // })
       this.solution = Object.assign({}, defaultM)
       this.dialogType = 'new'
       this.dialogFormVisible = true
@@ -292,6 +339,49 @@ export default {
       for (var i = 0; i < this.taskList.length; i++) {
         if (this.taskList[i].id == Number(row.task_id)) {
           return this.taskList[i].task_name
+        }
+      }
+    },
+    changeDatasetMeasurement(id) {
+      this.temp_list1 = []
+      this.temp_list2 = []
+      this.temp_list1 = this.t_d_m_list.filter(function (x) {
+          return x.task_id == id
+        })
+      this.temp_list2 = this.t_d_m_list.filter(function (x) {
+          return x.task_id == id
+        })
+      for (var i = 0; i < this.temp_list1.length; ++i) {
+        for(var j = 0; j < this.datasetList.length; ++j) {
+          if (this.datasetList[j].id == this.temp_list1[i].dataset_id) {
+            this.temp_list1[i]["dataset_name"] = this.datasetList[j].dataset_name;
+            break;
+          }
+        }
+      }
+
+      for (var i = 0; i < this.temp_list1.length; ++i) {
+        for(var j = i+1; j < this.temp_list1.length; ++j) {
+          if (this.temp_list1[j].dataset_id == this.temp_list1[i].dataset_id) {
+            this.temp_list1.splice(j, 1)
+          }
+        }
+      }
+      for (var i = 0; i < this.temp_list2.length; ++i) {
+        for(var j = 0; j < this.measurementList.length; ++j) {
+          if (this.measurementList[j].id == this.temp_list2[i].measurement_id) {
+            
+            this.temp_list2[i]["measurement_name"] = this.measurementList[j].name;
+            break;
+          }
+        }
+      }
+
+      for (var i = 0; i < this.temp_list2.length; ++i) {
+        for(var j = i+1; j < this.temp_list2.length; ++j) {
+          if (this.temp_list2[j].measurement_id == this.temp_list2[i].measurement_id) {
+            this.temp_list2.splice(j, 1)
+          }
         }
       }
     },
