@@ -384,6 +384,7 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
     
     def perform_create(self, serializer):
         fileobj = self.request.data.get('file')
+        print("******", self.request.data)
         name = fileobj._name
         #print(name)
         size = fileobj.size
@@ -397,62 +398,63 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
             type = '音频'
         elif 'application' or 'text' in mime:
             type = '文档'
-        if '_' in name:
-            dir_name, file_name = name.split('_')
+        
+        instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+        instance.path = settings.MEDIA_URL + name
+        instance.save()
+        # if '_' in name:
+        #     dir_name, file_name = name.split('_')
 
-            current_path = os.path.abspath(os.path.dirname(__file__))
-            parent_path = os.path.dirname(current_path)
-            parent_path = os.path.dirname(parent_path)
-            #media_path = parent_path + '\\media'
-            media_path = os.path.join(parent_path, 'media')
-            #dir_path = media_path + '\\codes\\' + dir_name
-            dir_path = os.path.join(media_path, 'codes', dir_name)
-            #print(dir_path)
-            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-            #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
-            instance.path = os.path.join(settings.MEDIA_URL, dir_name, file_name)
-            print(instance.path)
-            instance.save()
-            if not os.path.exists(dir_path):
-                os.makedirs(dir_path)
-            shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
+        #     current_path = os.path.abspath(os.path.dirname(__file__))
+        #     parent_path = os.path.dirname(current_path)
+        #     parent_path = os.path.dirname(parent_path)
+        #     #media_path = parent_path + '\\media'
+        #     media_path = os.path.join(parent_path, 'media')
+        #     #dir_path = media_path + '\\codes\\' + dir_name
+        #     dir_path = os.path.join(media_path, 'codes', dir_name)
+        #     #print(dir_path)
+        #     instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+        #     #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
+        #     instance.path = os.path.join(settings.MEDIA_URL, dir_name, file_name)
+        #     print(instance.path)
+        #     instance.save()
+        #     if not os.path.exists(dir_path):
+        #         os.makedirs(dir_path)
+        #     shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
             # os.remove(os.path.name)
-        elif '-' in name:
+        # elif '-' in name:
 
-            dir_name, file_name = name.split('-')
-
-            current_path = os.path.abspath(os.path.dirname(__file__))
-            parent_path = os.path.dirname(current_path)
-            parent_path = os.path.dirname(parent_path)
-            #media_path = parent_path + '\\media'
-            media_path = os.path.join(parent_path, 'media')
-            #dir_path = media_path + '\\codes\\' + dir_name
-            dir_path = os.path.join(media_path, 'dataset', dir_name)
-            #print(dir_path)
-            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-            #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
-            instance.path = os.path.join(settings.MEDIA_URL, 'dataset', dir_name, file_name)
-            print(instance.path)
-            instance.save()
-            if not os.path.exists(dir_path):
-                os.makedirs(dir_path)
-            shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
-            # os.remove(os.path.name)
-            if 'dataset' in name:
-                hostname=system_settings.hostname
-                username=system_settings.username
-                password = system_settings.password
-                port = system_settings.port
-                #self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
-                self.sendFile('/proj/django-vue-admin/server/' + instance.path, "D:/"+file_name)
-                server_obj = ServerByPara("python D:/unzip.py "+"D:/"+file_name+" D:/data/"+file_name.replace('.zip',''), hostname, username, password, "windows")
-                server_obj.run()
-                print("运行完毕")
+        #     dir_name, file_name = name.split('-') #dataset-iris
+        
+        #     current_path = os.path.abspath(os.path.dirname(__file__))
+        #     parent_path = os.path.dirname(current_path)
+        #     parent_path = os.path.dirname(parent_path)
+        #     #media_path = parent_path + '\\media'
+        #     media_path = os.path.join(parent_path, 'media')
+        #     #dir_path = media_path + '\\codes\\' + dir_name
+        #     dir_path = os.path.join(media_path, 'dataset', dir_name)
+        #     #print(dir_path)
+        #     instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+        #     #instance.path = settings.MEDIA_URL + dir_name + '/' + file_name
+        #     instance.path = os.path.join(settings.MEDIA_URL, 'dataset', dir_name, file_name)
+        #     print(instance.path)
+        #     instance.save()
+        #     if not os.path.exists(dir_path):
+        #         os.makedirs(dir_path)
+        #     shutil.copy(os.path.join(media_path,name),os.path.join(dir_path,file_name))
+        #     # os.remove(os.path.name)
+            # if 'dataset' in name:
+            #     hostname=system_settings.hostname
+            #     username=system_settings.username
+            #     password = system_settings.password
+            #     port = system_settings.port
+            #     #self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
+            #     self.sendFile('/proj/django-vue-admin/server/' + instance.path, "D:/"+file_name)
+            #     server_obj = ServerByPara("python D:/unzip.py "+"D:/"+file_name+" D:/data/"+file_name.replace('.zip',''), hostname, username, password, "windows")
+            #     server_obj.run()
+            #     print("运行完毕")
                 
-        else:
-            instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
-            instance.path = settings.MEDIA_URL + name
-            instance.save()
+        
 
 class MeasurementViewSet(ModelViewSet):
     """
@@ -545,12 +547,56 @@ class DatasetViewSet(ModelViewSet):
     search_fields = ['dataset_name']
     ordering_fields = ['pk']
     ordering = ['pk']
+    def sendFile(self,hereFilePath,thereFilePath):
+        hostname = system_settings.hostname
+        # username = "ADMIN"
+        username = system_settings.username
+        password = system_settings.password
+        port = system_settings.port
+        transport = paramiko.Transport((hostname, port))  # 建立远程连接
+        transport.connect(username=username, password=password)
+        sftp = paramiko.SFTPClient.from_transport(transport)
+        # 上传文件
+        print(hereFilePath)
+        print(thereFilePath)
+        sftp.put(hereFilePath, thereFilePath)
+        
+    def create(self, request, *args, **kwargs):
+        #保存文件
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        self.perform_create(serializer)
+        headers = self.get_success_headers(serializer.data)
+        print(request.data)
+        filename = request.data["dataset_name"] + ".zip"
+        #获取media路径
+        current_path = os.path.abspath(os.path.dirname(__file__))
+        parent_path = os.path.dirname(current_path)
+        parent_path = os.path.dirname(parent_path)
+        media_path = os.path.join(parent_path, 'media')
+        obj_path = media_path + "/dataset/dataset"
+        if not os.path.exists(obj_path):
+            os.makedirs(obj_path)
+        shutil.move(os.path.join(media_path, filename), os.path.join(obj_path, filename))
+
+        #发送到计算服务器
+        hostname=system_settings.hostname
+        username=system_settings.username
+        password = system_settings.password
+        port = system_settings.port
+        #self.sendFile('D:\codes\django-vue-admin\server/'+instance.path, "D:/"+file_name)
+        self.sendFile(os.path.join(obj_path, filename), "D:/"+filename)
+        server_obj = ServerByPara("python D:/unzip.py "+"D:/"+filename+" D:/data/", hostname, username, password, "windows")
+        server_obj.run()
+        print("运行完毕")
+
+        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
     def perform_destroy(self, instance):
         current_dir = os.path.abspath(os.path.dirname(__file__))
         parent_path = os.path.dirname(current_dir)
         parent_path = os.path.dirname(parent_path)
-        os.remove(parent_path+'/media/'+instance.dataset_name+'.zip')
+        # os.remove(parent_path+'/media/'+instance.dataset_name+'.zip')
         instance.delete()
 
 
@@ -567,6 +613,24 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
     search_fields = ['solutionId','solutionName', 'taskName']
     ordering_fields = ['pk']
     ordering=['pk']
+
+    def get_task_name(self,task_id):
+        '''
+        获取任务name
+        '''
+        conn = pymysql.connect(host=system_settings.mysql_host, port=system_settings.mysql_port, 
+        user=system_settings.mysql_user, password=system_settings.mysql_password, db='aishare', charset='utf8')
+        cur = conn.cursor()
+        print("连接成功")
+        sql="select task_name from system_task where id=%d" %(task_id)
+        print("查询命令为:",sql)
+        cur.execute(sql)
+        result = cur.fetchall()
+        print("查询结果为:",result)
+        cur.close()
+        conn.close()
+        return result[0][0]
+
     def get_solution_id(self,solutionName):
         '''
         获取方案id
@@ -585,7 +649,7 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
         return result[0][0]
 
     def create(self, request, *args, **kwargs):
-
+        print(request.data)
         serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         self.perform_create(serializer)
@@ -596,6 +660,22 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
                 measurement_id = measurement_temp)
                 print("多表保存成功")
         headers = self.get_success_headers(serializer.data)
+
+        filename = request.data["solutionName"] + ".zip"
+
+        # 获取media路径
+        current_path = os.path.abspath(os.path.dirname(__file__))
+        parent_path = os.path.dirname(current_path)
+        parent_path = os.path.dirname(parent_path)
+        media_path = os.path.join(parent_path, 'media')
+
+        foldername = self.get_task_name(request.data["task_id"])
+        print(foldername)
+        obj_path = media_path + "/codes/" + foldername
+        if not os.path.exists(obj_path):
+            os.makedirs(obj_path)
+        shutil.move(os.path.join(media_path, filename), os.path.join(obj_path, filename))
+
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class TasktypeViewSet(ModelViewSet):
