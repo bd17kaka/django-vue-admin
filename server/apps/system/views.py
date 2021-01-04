@@ -535,6 +535,34 @@ class TaskViewSet(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
     # def perform_create():
 
+    def destroy(self, request, *args, **kwargs):
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        #获得要删除的任务id
+        theStringRequest=str(request._request)
+        theStringRequest=theStringRequest.replace("/"," ")
+        print(theStringRequest)
+        theID=theStringRequest.split(" ")[-2]
+
+        #删除该任务下的所有方案
+        query_result = Solution.objects.filter(task_id = int(theID))
+        for temp_solution in query_result:
+            query_solution_result = solution_result.objects.filter(solution_id = temp_solution.id)
+            for temp_result in query_solution_result:
+                temp_result.is_deleted=1
+                temp_result.save()
+            temp_solution.is_deleted=1
+            temp_solution.save()
+
+        #删除该任务与数据集和评价指标的匹配信息
+        query_result = task_dataset_measurement.objects.filter(task_id = int(theID))
+        for temp_match in query_result:
+            temp_match.is_deleted=1
+            temp_match.save()
+
+        return Response(status=status.HTTP_204_NO_CONTENT)
+        
 class DatasetViewSet(ModelViewSet):
     '''
     数据集-增删改查
@@ -677,6 +705,25 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
         shutil.move(os.path.join(media_path, filename), os.path.join(obj_path, filename))
 
         return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
+    def destroy(self, request, *args, **kwargs):
+        #获得要删除的方案id
+        theStringRequest=str(request._request)
+        theStringRequest=theStringRequest.replace("/"," ")
+        print(theStringRequest)
+        theID=theStringRequest.split(" ")[-2]
+        #print(theID)
+
+        instance = self.get_object()
+        self.perform_destroy(instance)
+
+        query_result = solution_result.objects.filter(solution_id = int(theID))
+        #print(solution_result)
+        for temp_solution in query_result:
+            temp_solution.is_deleted=1
+            temp_solution.save()
+            # print(temp_solution.)
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 class TasktypeViewSet(ModelViewSet):
     '''
