@@ -80,6 +80,7 @@
             size="small"
             icon="el-icon-download"
             title="批量下载此任务下所有方案"
+            style="margin-left: 10px;"
           />
           </a>
         </template>
