@@ -1,8 +1,7 @@
 <template>
   <div class="app-container">
     <div style="margin-top:10px">
-      <el-input v-model="listQuery.search" placeholder="请输入任务名称进行搜索"
-        style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
+      <el-input v-model="listQuery.search" placeholder="请输入任务名称进行搜索" style="width: 300px;" class="filter-item" @keyup.enter.native="handleFilter"/>
       <el-button class="filter-item" type="primary" icon="el-icon-search" @click="handleFilter">搜索</el-button>
       <el-button class="filter-item" style="margin-left: 10px;" type="primary" icon="el-icon-refresh-left" @click="resetFilter">刷新重置</el-button>
       <el-button type="primary" icon="el-icon-plus" @click="handleAdd">新增任务</el-button>
@@ -24,9 +23,9 @@
         <template slot-scope="scope">{{ scope.row.task_name }}</template>
       </el-table-column>
 
-     <el-table-column label="任务类型">
-       <template slot-scope="scope">{{ scope.row.tasktype_name }}</template>
-     </el-table-column>
+      <el-table-column label="任务类型">
+        <template slot-scope="scope">{{ scope.row.tasktype_name }}</template>
+      </el-table-column>
 
       <el-table-column label="创建日期">
         <template slot-scope="scope">
@@ -75,39 +74,40 @@
             title="删除"
           />
           <a :href="downloadurl + '/system/download/' + scope.row.task_name" target="_blank">
-          <el-button
-            type="success"
-            size="small"
-            icon="el-icon-download"
-            title="批量下载此任务下所有方案"
-            style="margin-left: 10px;"
-          />
+            <el-button
+              type="success"
+              size="small"
+              icon="el-icon-download"
+              title="批量下载此任务下所有方案"
+              style="margin-left: 10px;"
+            />
           </a>
         </template>
       </el-table-column>
     </el-table>
 
     <el-dialog :visible.sync="dialogTableVisible" title="任务详细信息" width="80%">
-        <el-table :data="taskshowList" border>
-            <el-table-column property="task_name" label="任务名称"></el-table-column>
-            <el-table-column prop="task_type_id" label="任务类型" :formatter="formatTasktype"></el-table-column>
-            <el-table-column property="create_time" label="创建日期"></el-table-column>
-            <el-table-column property="update_time" label="修改日期"></el-table-column>
-            <el-table-column property="matched_dataset" label="数据集"></el-table-column>
-            <el-table-column property="task_measurement" label="评价指标"></el-table-column>
-            <el-table-column property="description" label="任务描述"></el-table-column>
-<!--            <el-table-column property="task_status" label="任务状态" width="130"></el-table-column>-->
-        </el-table>
+      <el-table :data="taskShowList" border>
+        <el-table-column property="task_name" label="任务名称"></el-table-column>
+        <el-table-column prop="task_type_id" label="任务类型" :formatter="formatTasktype"></el-table-column>
+        <el-table-column property="create_time" label="创建日期"></el-table-column>
+        <el-table-column property="update_time" label="修改日期"></el-table-column>
+        <el-table-column prop="dataset_id" :formatter="formatDataset" label="数据集"></el-table-column>
+        <el-table-column prop="measurement_id" :formatter="formatMeasurement" label="评价指标"></el-table-column>
+        <el-table-column property="description" label="任务描述"></el-table-column>
+      </el-table>
     </el-dialog>
 
     <el-dialog :visible.sync="dialogTableAllVisible" title="方案信息" width="80%">
-        <el-table :data="solutionAllShowList" border>
-            <el-table-column property="userName" sortable label="用户名" ></el-table-column>
-            <el-table-column property="solutionName" label="方案名称" ></el-table-column>
-            <el-table-column property="solutionResult" sortable label="方案结果"></el-table-column>
-        </el-table>
+      <el-table :data="solutionAllShowList" border>
+        <el-table-column property="create_by" :formatter="formatUser" label="用户名"></el-table-column>
+        <el-table-column property="solution_name" label="方案名称"></el-table-column>
+        <el-table-column prop="dataset_id" :formatter="formatDataset" label="数据集"></el-table-column>
+        <el-table-column prop="measurement_id" :formatter="formatMeasurement" label="评价指标"></el-table-column>
+        <el-table-column property="solution_status" label="方案状态"></el-table-column>
+        <el-table-column property="solution_result" label="方案结果"></el-table-column>
+      </el-table>
     </el-dialog>
-
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑任务':'新增任务'">
       <el-form
         ref="Form"
@@ -116,36 +116,36 @@
         label-position="right"
         :rules="rule1"
       >
-            <el-form-item label="任务名称" prop="task_name">
+        <el-form-item label="任务名称" prop="task_name">
           <el-input v-model="task.task_name" placeholder="任务名称" />
         </el-form-item>
         <el-form-item label="任务类型" prop="task_type_id">
           <el-select v-model="task.task_type_id"  @change="changeMeasurement(task.task_type_id)" placeholder="请选择任务类型" style="width:100%">
-           <el-option
-            v-for="item in tasktype"
-             :key="item.id"
-             :label="item.tasktype_name"
-             :value="item.id"
-           />
+            <el-option
+              v-for="item in tasktype"
+              :key="item.id"
+              :label="item.tasktype_name"
+              :value="item.id"
+            />
           </el-select>
         </el-form-item>
         <el-form-item label="数据集" prop="matched_dataset">
           <el-select v-model ="task.matched_dataset" multiple placeholder="请选择数据集" style = "width:100%">
             <el-option
-            v-for="item in dataset"
-            :key="item.id"
-            :label="item.dataset_name"
-            :value="item.id"
+              v-for="item in dataset"
+              :key="item.id"
+              :label="item.dataset_name"
+              :value="item.id"
             />
           </el-select>
         </el-form-item>
         <el-form-item label="评价指标" prop="task_measurement">
           <el-select v-model ="task.task_measurement" multiple placeholder="请选择评价指标" style = "width:100%">
             <el-option
-            v-for="item in temp_list"
-            :key="item.value"
-            :label="item.measurement_name"
-            :value="item.value"
+              v-for="item in temp_list"
+              :key="item.value"
+              :label="item.measurement_name"
+              :value="item.value"
             />
           </el-select>
         </el-form-item>
@@ -169,22 +169,22 @@
 </template>
 
 <script>
-import { getTasktypeAll } from "@/api/tasktype"
-import { getDatasetAll } from "@/api/dataset"
-import {getMeasurementAll} from"@/api/measurement"
-import { getSolutionAll } from '@/api/solution'
+import { getTasktypeAll } from '@/api/tasktype'
+import { getDatasetAll } from '@/api/dataset'
+import { getMeasurementAll } from '@/api/measurement'
+import { getSolutionAll, getSolutionResultAll } from '@/api/solution'
 import { getUserAll } from '@/api/user'
 import {
   getTaskList,
-  getTaskAll,
   createTask,
   deleteTask,
   updateTask,
-  getTasktypeMeasurementAll
+  getTasktypeMeasurementAll,
+  getDatasetMeasurementAll
 } from '@/api/task'
-import { genTree, deepClone } from '@/utils'
+import { genTree } from '@/utils'
 import checkPermission from '@/utils/permission'
-import Pagination from "@/components/Pagination"
+import Pagination from '@/components/Pagination'
 
 const defaultM = {
   id: '',
@@ -201,7 +201,7 @@ export default {
       search: '',
       tableData: [],
       downloadurl: process.env.VUE_APP_BASE_API,
-      taskList:  {count:0},
+      taskList: { count: 0 },
       listQuery: {
         page: 1,
         page_size: 20
@@ -209,23 +209,15 @@ export default {
       tasktype: [],
       dataset: [],
       t_m_list: [],
+      s_r_list: [],
+      d_m_list: [],
       temp_list: [],
       user: [],
       solution: [],
       measurement: [],
       solutionAllShowList: [],
-      taskshowList: [{
-        id: '',
-        task_name: '',
-        task_type_id: '',
-        task_type_name: '',
-        create_time: '',
-        update_time: '',
-        matched_dataset: '',
-        task_measurement: '',
-        description: '',
-        task_status: '',
-      }],
+      s_temp_list: [],
+      taskShowList: [],
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
@@ -248,9 +240,11 @@ export default {
     this.getSolutionAll()
     this.getUserAll()
     this.getTasktypeMeasurementAll()
+    this.getSolutionResultAll()
+    this.getDatasetMeasurementAll()
   },
   mounted() {
-    this.getList();
+    this.getList()
   },
   methods: {
     checkPermission,
@@ -263,108 +257,91 @@ export default {
         for (var i = 0; i < this.taskList.results.length; i++) {
           for (var j = 0; j < this.tasktype.length; j++) {
             if (this.tasktype[j].id == this.taskList.results[i].task_type_id) {
-              this.taskList.results[i]["tasktype_name"] = this.tasktype[j].tasktype_name
+              this.taskList.results[i]['tasktype_name'] = this.tasktype[j].tasktype_name
               break
             }
           }
         }
-        // console.log(this.taskList.results)
-        this.listLoading = false;
-      });
+        this.listLoading = false
+      })
     },
-    getMeasurement:function (id) {
-      // console.log(this.tasktype)
-      // console.log(id)
-        // var citys=this.areas.filter(function (city) {
-        //   return city.pid == id;
-        // })
-        // this.citys = citys;
-      },
     resetFilter() {
       this.listQuery = {
         page: 1,
         page_size: 20
-      };
-      this.getList();
+      }
+      this.getList()
     },
     handleFilter() {
-      this.listQuery.page = 1;
-      this.getList();
+      this.listQuery.page = 1
+      this.getList()
     },
     getTasktypeAll() {
       getTasktypeAll().then(response => {
-        this.tasktype = genTree(response.data.results);
-        // console.log("a")
-        // console.log(response.data.results)
-        // console.log("a")
-      });
+        this.tasktype = genTree(response.data.results)
+      })
     },
     getDatasetAll() {
       getDatasetAll().then(response => {
-        this.dataset = genTree(response.data.results);
-      });
+        this.dataset = genTree(response.data.results)
+      })
     },
     getSolutionAll() {
       getSolutionAll().then(response => {
-        // console.log(response.data.results)
         this.solution = response.data.results
-        // console.log(this.solution)
       })
     },
     getUserAll() {
       getUserAll().then(response => {
-        this.user = genTree(response.data.results);
-      });
+        this.user = genTree(response.data.results)
+      })
     },
     getMeasurementAll() {
       getMeasurementAll().then(response => {
-        this.measurement = genTree(response.data);
-      });
+        this.measurement = genTree(response.data)
+      })
     },
     getTasktypeMeasurementAll() {
       getTasktypeMeasurementAll().then(response => {
-        // console.log(response.data)
-        this.t_m_list = genTree(response.data.results);
-        // console.log(this.t_m_list);
-      });
+        this.t_m_list = genTree(response.data.results)
+      })
+    },
+    getSolutionResultAll() {
+      getSolutionResultAll().then(response => {
+        this.s_r_list = genTree(response.data.results)
+      })
+    },
+    getDatasetMeasurementAll() {
+      getDatasetMeasurementAll().then(response => {
+        this.d_m_list = genTree(response.data.results)
+      })
     },
     handleShow(scope) {
-      this.taskshowList[0].id = scope.row.id
-      // this.taskshowList[0].task_name = scope.row.task_name
-      // this.taskshowList[0].task_type = scope.row.task_type
-      this.taskshowList[0].task_type_id = scope.row.task_type_id
-      // for (var k = 0; k < this.tasktype.length; k++) {
-      //   if (this.tasktype[k].id == scope.row.task_type_id) {
-      //     this.taskshowList[0].task_type_name = this.tasktype[k].tasktype_name
-      //     break
-      //   }
-      // }
-      // console.log("123")
-      // console.log(this.taskshowList[0].task_tpye_id)
-      this.taskshowList[0].create_time = scope.row.create_time
-      this.taskshowList[0].update_time = scope.row.update_time
-      this.taskshowList[0].matched_dataset = scope.row.matched_dataset
-      this.taskshowList[0].description = scope.row.description
-      this.taskshowList[0].task_status = scope.row.task_status
+      this.taskShowList = this.d_m_list.filter(x => {
+        return x.task_id == scope.row.id
+      })
+      for (var i = 0; i < this.taskShowList.length; i++) {
+        this.taskShowList[i]['task_name'] = scope.row.task_name
+        this.taskShowList[i]['task_type_id'] = scope.row.task_type_id
+      }
       this.dialogTableVisible = true
     },
     handleShowSolution(scope) {
       this.solutionAllShowList = []
-      for (var k = 0; k < this.solution.length; k++) {
-        if (this.solution[k].taskName == scope.row.task_name) {
-          var username_temp = ''
-          for (var j = 0; j < this.user.length; j++) {
-            if (this.user[j].id == this.solution[k].userId) {
-              username_temp = this.user[j].username
-              break
-            }
+      for (var i = 0; i < this.solution.length; i++) {
+        this.s_temp_list = []
+        if (this.solution[i].task_id == scope.row.id) {
+          this.s_temp_list = this.s_r_list.filter(x => {
+            return x.solution_id == this.solution[i].id
+          })
+          for (var j = 0; j < this.s_temp_list.length; j++) {
+            this.s_temp_list[j]['create_by'] = this.solution[i].create_by
+            this.s_temp_list[j]['solution_name'] = this.solution[i].solutionName
+            this.s_temp_list[j]['solution_status'] = this.solution[i].solution_status
           }
-          this.solutionAllShowList.push({
-            userName: username_temp, solutionName: this.solution[k].solutionName,
-            solutionResult: this.solution[k].solutionResult })
+          this.solutionAllShowList = this.solutionAllShowList.concat(this.s_temp_list)
         }
       }
-      // console.log(this.solutionAllShowList)
       this.dialogTableAllVisible = true
     },
     handleAdd() {
@@ -376,9 +353,6 @@ export default {
       })
     },
     handleEdit(scope) {
-      console.log("this is a test")
-      console.log(scope.row.id)
-      console.log(this.solution)
       var list = this.solution.filter(function (x) {
           return x.task_id == scope.row.id
       })
@@ -396,7 +370,7 @@ export default {
             this.$refs['Form'].clearValidate()
           })
       }
-      
+
     },
     handleDelete(scope) {
       var list = this.solution.filter(function (x) {
@@ -444,6 +418,27 @@ export default {
       for (var i = 0; i < this.tasktype.length; i++) {
         if (this.tasktype[i].id == Number(row.task_type_id)) {
           return this.tasktype[i].tasktype_name;
+        }
+      }
+    },
+    formatUser(row, column) {
+      for (var i = 0; i < this.user.length; i++) {
+        if (this.user[i].id == Number(row.create_by)) {
+          return this.user[i].name
+        }
+      }
+    },
+    formatDataset(row) {
+      for (var i = 0; i < this.dataset.length; i++) {
+        if (this.dataset[i].id == Number(row.dataset_id)) {
+          return this.dataset[i].dataset_name
+        }
+      }
+    },
+    formatMeasurement(row) {
+      for (var i = 0; i < this.measurement.length; i++) {
+        if (this.measurement[i].id == Number(row.measurement_id)) {
+          return this.measurement[i].name
         }
       }
     },

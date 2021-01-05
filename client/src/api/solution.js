@@ -22,13 +22,6 @@ export function getSolutionList(query) {
   })
 }
 
-// export function getSolution(id) {
-//   return request({
-//     url: `/system/solution/${id}/`,
-//     method: 'get'
-//   })
-// }
-
 export function createSolution(data) {
   return request({
     url: '/system/solution/',
@@ -46,10 +39,15 @@ export function updateSolution(id, data) {
 }
 
 export function deleteSolution(id) {
-  // console.log("这里3")
   return request({
     url: `/system/solution/${id}/`,
-    method: 'delete',
+    method: 'delete'
   })
+}
 
+export function getSolutionResultAll() {
+  return request({
+    url: '/system/solution_result/',
+    method: 'get'
+  })
 }

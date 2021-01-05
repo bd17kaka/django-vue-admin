@@ -62,11 +62,12 @@
         <el-table-column prop="create_by" label="用户名" :formatter="formatUser"></el-table-column>
         <el-table-column property="solutionName" label="方案名称"></el-table-column>
         <el-table-column prop="task_id" label="任务名称" :formatter="formatTask"></el-table-column>
-        <el-table-column property="solutionResult" label="方案结果"></el-table-column>
+        <el-table-column prop="dataset_id" label="数据集" :formatter="formatDataset"></el-table-column>
+        <el-table-column prop="measurement_id" label="评价指标" :formatter="formatMeasurement"></el-table-column>
+        <el-table-column property="solution_result" label="方案结果"></el-table-column>
         <el-table-column property="solution_status" :formatter="stateFormat" label="方案状态"></el-table-column>
       </el-table>
     </el-dialog>
-
 
     <el-dialog :visible.sync="dialogFormVisible" :title="dialogType==='edit'?'编辑方案':'新增方案'">
       <el-form
@@ -145,7 +146,8 @@ import {
   getSolutionList,
   createSolution,
   deleteSolution,
-  updateSolution
+  updateSolution,
+  getSolutionResultAll
 } from '@/api/solution'
 import { genTree } from '@/utils'
 import checkPermission from '@/utils/permission'
@@ -177,16 +179,7 @@ export default {
       search: '',
       tableData: [],
       solutionList: { count: 0 },
-      solutionShowList: [{
-        id: '',
-        solutionName: '',
-        taskName: '',
-        task_id: '',
-        userName: '',
-        create_by: '',
-        solutionResult: '',
-        solution_status: ''
-      }],
+      solutionShowList: [],
       listQuery: {
         page: 1,
         page_size: 20
@@ -195,6 +188,7 @@ export default {
       user: [],
       datasetList: [],
       measurementList: [],
+      s_r_list: [],
       t_d_m_list: [],
       temp_list1: [],
       temp_list2: [],
@@ -210,12 +204,13 @@ export default {
   computed: {},
   stateFormat: {},
   created() {
-    this.getList()
     this.getTaskAll()
     this.getUserAll()
     this.getDatasetMeasurementAll()
     this.getDatasetAll()
     this.getMeasurementAll()
+    this.getSolutionResultAll()
+    this.getList()
   },
   methods: {
     checkPermission,
@@ -255,6 +250,11 @@ export default {
         this.t_d_m_list = genTree(response.data.results);
       });
     },
+    getSolutionResultAll() {
+      getSolutionResultAll().then(response => {
+        this.s_r_list = genTree(response.data.results)
+      })
+    },
     getList() {
       this.listLoading = true
       getSolutionList(this.listQuery).then(response => {
@@ -284,11 +284,15 @@ export default {
       this.getList()
     },
     handleShow(scope) {
-      this.solutionShowList[0].solutionName = scope.row.solutionName
-      this.solutionShowList[0].task_id = scope.row.task_id
-      this.solutionShowList[0].create_by = scope.row.create_by
-      this.solutionShowList[0].solutionResult = scope.row.solutionResult
-      this.solutionShowList[0].solution_status = scope.row.solution_status
+      this.solutionShowList = this.s_r_list.filter(x => {
+        return x.solution_id == scope.row.id
+      })
+      for (var i = 0; i < this.solutionShowList.length; i++) {
+        this.solutionShowList[i]['solutionName'] = scope.row.solutionName
+        this.solutionShowList[i]['task_id'] = scope.row.task_id
+        this.solutionShowList[i]['create_by'] = scope.row.create_by
+        this.solutionShowList[i]['solution_status'] = scope.row.solution_status
+      }
       this.dialogTableVisible = true
     },
     handleAdd() {
@@ -342,26 +346,39 @@ export default {
         }
       }
     },
+    formatDataset(row) {
+      for (var i = 0; i < this.datasetList.length; i++) {
+        if (this.datasetList[i].id == Number(row.dataset_id)) {
+          return this.datasetList[i].dataset_name
+        }
+      }
+    },
+    formatMeasurement(row) {
+      for (var i = 0; i < this.measurementList.length; i++) {
+        if (this.measurementList[i].id == Number(row.measurement_id)) {
+          return this.measurementList[i].name
+        }
+      }
+    },
     changeDatasetMeasurement(id) {
       this.temp_list1 = []
       this.temp_list2 = []
-      this.temp_list1 = this.t_d_m_list.filter(function (x) {
-          return x.task_id == id
-        })
-      this.temp_list2 = this.t_d_m_list.filter(function (x) {
-          return x.task_id == id
-        })
+      this.temp_list1 = this.t_d_m_list.filter(function(x) {
+        return x.task_id == id
+      })
+      this.temp_list2 = this.t_d_m_list.filter(function(x) {
+        return x.task_id == id
+      })
       for (var i = 0; i < this.temp_list1.length; ++i) {
-        for(var j = 0; j < this.datasetList.length; ++j) {
+        for (var j = 0; j < this.datasetList.length; ++j) {
           if (this.datasetList[j].id == this.temp_list1[i].dataset_id) {
-            this.temp_list1[i]["dataset_name"] = this.datasetList[j].dataset_name;
-            break;
+            this.temp_list1[i]['dataset_name'] = this.datasetList[j].dataset_name
+            break
           }
         }
       }
-
       for (var i = 0; i < this.temp_list1.length; ++i) {
-        for(var j = i+1; j < this.temp_list1.length; ++j) {
+        for (var j = i+1; j < this.temp_list1.length; ++j) {
           if (this.temp_list1[j].dataset_id == this.temp_list1[i].dataset_id) {
             this.temp_list1.splice(j, 1)
           }
@@ -370,15 +387,13 @@ export default {
       for (var i = 0; i < this.temp_list2.length; ++i) {
         for(var j = 0; j < this.measurementList.length; ++j) {
           if (this.measurementList[j].id == this.temp_list2[i].measurement_id) {
-            
-            this.temp_list2[i]["measurement_name"] = this.measurementList[j].name;
-            break;
+            this.temp_list2[i]['measurement_name'] = this.measurementList[j].name
+            break
           }
         }
       }
-
       for (var i = 0; i < this.temp_list2.length; ++i) {
-        for(var j = i+1; j < this.temp_list2.length; ++j) {
+        for (var j = i + 1; j < this.temp_list2.length; ++j) {
           if (this.temp_list2[j].measurement_id == this.temp_list2[i].measurement_id) {
             this.temp_list2.splice(j, 1)
           }
