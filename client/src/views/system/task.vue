@@ -376,30 +376,56 @@ export default {
       })
     },
     handleEdit(scope) {
-      this.task = Object.assign({}, scope.row)
-      this.dialogType = 'edit'
-      this.dialogFormVisible = true
-      this.$nextTick(() => {
-        this.$refs['Form'].clearValidate()
+      console.log("this is a test")
+      console.log(scope.row.id)
+      console.log(this.solution)
+      var list = this.solution.filter(function (x) {
+          return x.task_id == scope.row.id
       })
+      if(list.length!=0){
+        this.$alert('该任务下已有方案，无法更改', '警告！！', {
+        confirmButtonText: '确定',
+        });
+
+      }
+      else{
+          this.task = Object.assign({}, scope.row)
+          this.dialogType = 'edit'
+          this.dialogFormVisible = true
+          this.$nextTick(() => {
+            this.$refs['Form'].clearValidate()
+          })
+      }
+      
     },
     handleDelete(scope) {
-      this.$confirm('确认删除?', '警告', {
-        confirmButtonText: '确认',
-        cancelButtonText: '取消',
-        type: 'error'
+      var list = this.solution.filter(function (x) {
+          return x.task_id == scope.row.id
       })
-        .then(async() => {
-          await deleteTask(scope.row.id)
-          this.getList()
-          this.$message({
-            type: 'success',
-            message: '成功删除!'
+      if(list.length!=0){
+        this.$alert('该任务下已有方案，无法更改', '警告！！', {
+        confirmButtonText: '确定',
+        });
+
+      }
+      else{
+          this.$confirm('确认删除?', '警告', {
+          confirmButtonText: '确认',
+          cancelButtonText: '取消',
+          type: 'error'
+        })
+          .then(async() => {
+            await deleteTask(scope.row.id)
+            this.getList()
+            this.$message({
+              type: 'success',
+              message: '成功删除!'
+            })
           })
-        })
-        .catch(err => {
-          console.error(err)
-        })
+          .catch(err => {
+            console.error(err)
+          })
+      }
     },
     changeMeasurement(id){
       this.temp_list = this.t_m_list.filter(function (x) {

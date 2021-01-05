@@ -520,7 +520,7 @@ class TaskViewSet(RbacFilterSet, ModelViewSet):
                 # to_be_stored_data['dataset_id']=dataset_temp
                 # to_be_stored_data['measurement_id']=measurement_temp
                 # print(to_be_stored_data)
-                t_d_mea_obj = task_dataset_measurement.objects.create(task_id = task_id, dataset_id = dataset_temp,
+                task_dataset_measurement.objects.create(task_id = task_id, dataset_id = dataset_temp,
                 measurement_id = measurement_temp)
                 # self.t_d_mea = task_dataset_measurementViewSet()
                 # self.t_d_mea.create(request=to_be_stored_data)
@@ -562,6 +562,31 @@ class TaskViewSet(RbacFilterSet, ModelViewSet):
             temp_match.save()
 
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+    def update(self, request, *args, **kwargs):
+        partial = kwargs.pop('partial', False)
+        # partial=False
+        instance = self.get_object()
+        serializer = self.get_serializer(instance, data=request.data, partial=partial)
+        serializer.is_valid(raise_exception=True)
+        self.perform_update(serializer)
+
+        task_id = self.get_task_id(request.data["task_name"])
+
+        task_dataset_measurement.objects.filter(task_id=task_id).delete()
+        for dataset_temp in request.data["matched_dataset"]:
+            for measurement_temp in request.data["task_measurement"]:
+                task_dataset_measurement.objects.create(task_id = task_id, dataset_id = dataset_temp,
+                measurement_id = measurement_temp)
+
+
+
+        if getattr(instance, '_prefetched_objects_cache', None):
+            # If 'prefetch_related' has been applied to a queryset, we need to
+            # forcibly invalidate the prefetch cache on the instance.
+            instance._prefetched_objects_cache = {}
+
+        return Response(serializer.data)
         
 class DatasetViewSet(ModelViewSet):
     '''
