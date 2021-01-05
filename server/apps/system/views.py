@@ -470,7 +470,7 @@ class MeasurementViewSet(ModelViewSet):
     ordering = ['pk']
 
 
-class TaskViewSet(ModelViewSet):
+class TaskViewSet(RbacFilterSet, ModelViewSet):
     '''
     任务-增删改查
     '''

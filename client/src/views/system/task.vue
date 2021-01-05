@@ -241,7 +241,6 @@ export default {
   computed: {},
   formatterTasktype: {},
   created() {
-    this.getList();
     this.getTasktypeAll()
     this.getDatasetAll()
     this.getMeasurementAll()
@@ -249,13 +248,16 @@ export default {
     this.getUserAll()
     this.getTasktypeMeasurementAll()
   },
+  mounted() {
+    this.getList();
+  },
   methods: {
     checkPermission,
     getList() {
       this.listLoading = true;
       getTaskList(this.listQuery).then(response => {
         if (response.data) {
-          this.taskList = response.data        
+          this.taskList = response.data
         }
         for (var i = 0; i < this.taskList.results.length; i++) {
           for (var j = 0; j < this.tasktype.length; j++) {
@@ -418,15 +420,6 @@ export default {
         }
       }
     },
-    // formatMeasurement(row,column){
-    //   console.log("aaa");
-    //   console.log(this.task.task_measurement);
-    //   for (var i = 0; i < this.measurement.length; i++) {
-    //     if (this.measurement[i].id == Number(row.task_measurement)) {
-    //       return this.measurement[i].name;
-    //     }
-    //   }
-    // },
     async confirm(form) {
       this.$refs[form].validate(valid => {
         if (valid) {

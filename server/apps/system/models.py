@@ -258,7 +258,7 @@ class Dataset(BaseModel):
         return self.dataset_name
 
 
-class Task(BaseModel):
+class Task(CommonBModel):
     '''
     任务
     '''
