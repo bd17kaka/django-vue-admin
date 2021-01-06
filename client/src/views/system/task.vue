@@ -323,6 +323,7 @@ export default {
       for (var i = 0; i < this.taskShowList.length; i++) {
         this.taskShowList[i]['task_name'] = scope.row.task_name
         this.taskShowList[i]['task_type_id'] = scope.row.task_type_id
+        this.taskShowList[i]['description'] = scope.row.description
       }
       this.dialogTableVisible = true
     },
