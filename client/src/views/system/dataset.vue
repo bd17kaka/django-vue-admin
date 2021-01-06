@@ -24,7 +24,7 @@
         <template slot-scope="scope">
           <el-link
             type="primary"
-            :href="downloadurl+'/media/'+scope.row.dataset_name+'.zip'"
+            :href="downloadurl+'/media/dataset/dataset/'+scope.row.dataset_name+'.zip'"
             target="_blank">
             {{ scope.row.dataset_name }}
           </el-link>
