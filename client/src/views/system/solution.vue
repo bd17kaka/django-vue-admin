@@ -192,7 +192,6 @@ export default {
       t_d_m_list: [],
       temp_list1: [],
       temp_list2: [],
-      temp_list3:[],
       listLoading: true,
       dialogFormVisible: false,
       dialogTableVisible: false,
@@ -378,29 +377,13 @@ export default {
           }
         }
       }
-      this.temp_list3 = []
-      // console.log(this.temp_list2.length)
-      for(var i=0; i<this.temp_list1.length;i++){
-        var no_exitFlag=1
-        for(var j=0; j<this.temp_list3.length;j++){
-          if (this.temp_list3[j].dataset_id == this.temp_list1[i].dataset_id) {
-            no_exitFlag=0;
-            break;
+      for (var i = 0; i < this.temp_list1.length; ++i) {
+        for (var j = i+1; j < this.temp_list1.length; ++j) {
+          if (this.temp_list1[j].dataset_id == this.temp_list1[i].dataset_id) {
+            this.temp_list1.splice(j, 1)
           }
         }
-        if(no_exitFlag){
-          this.temp_list3.push(this.temp_list1[i])
-        }
       }
-
-      this.temp_list1=this.temp_list3
-      // for (var i = 0; i < this.temp_list1.length; ++i) {
-      //   for (var j = i+1; j < this.temp_list1.length; ++j) {
-      //     if (this.temp_list1[j].dataset_id == this.temp_list1[i].dataset_id) {
-      //       this.temp_list1.splice(j, 1)
-      //     }
-      //   }
-      // }
       for (var i = 0; i < this.temp_list2.length; ++i) {
         for(var j = 0; j < this.measurementList.length; ++j) {
           if (this.measurementList[j].id == this.temp_list2[i].measurement_id) {
@@ -409,21 +392,13 @@ export default {
           }
         }
       }
-
-      this.temp_list3 = []
       for (var i = 0; i < this.temp_list2.length; ++i) {
-        var no_exitFlag=1
-        for (var j = 0; j < this.temp_list3.length; ++j) {
-          if (this.temp_list3[j].measurement_id == this.temp_list2[i].measurement_id) {
-            no_exitFlag=0;
-            break;
+        for (var j = i + 1; j < this.temp_list2.length; ++j) {
+          if (this.temp_list2[j].measurement_id == this.temp_list2[i].measurement_id) {
+            this.temp_list2.splice(j, 1)
           }
         }
-        if(no_exitFlag){
-          this.temp_list3.push(this.temp_list2[i])
-        }
       }
-      this.temp_list2=this.temp_list3
     },
     async confirm(form) {
       this.$refs[form].validate(valid => {

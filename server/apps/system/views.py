@@ -1,5 +1,8 @@
 import logging
 import os
+import time
+import subprocess
+from pathlib import Path
 import pandas as pd
 import shutil
 import pymysql
@@ -14,7 +17,7 @@ from . import system_settings
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
 from django_filters.rest_framework import DjangoFilterBackend
@@ -49,6 +52,9 @@ from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           UserCreateSerializer, UserListSerializer,
                           UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer,
                           task_type_measurementSerializer, task_dataset_measurementSerializer, solution_resultSerializer)
+
+from .test import get_trace, create_representation, classifier_fit
+from .txt import txtWirte, txtRead
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -798,3 +804,133 @@ def Download(request,filename):
     print("打包完毕")
     # return HttpResponseRedirect("http://localhost:8000/media/"+filename+".zip")
     return HttpResponseRedirect(system_settings.ip+"media/"+filename+".zip")
+
+#软件测试
+class AFDResponse(Response):
+    def __init__(self, code=10000, msg="Success", data="", status=None,
+                 template_name=None, headers=None,
+                 exception=False, content_type=None):
+        super(AFDResponse, self).__init__(data, status, template_name, headers,
+                                         exception, content_type)
+
+        self.data = {"code": code, "msg": msg, "data": data}
+
+class TraceView(APIView):
+    def post(self, request, *args, **kwargs):
+        trace_type = request.data['trace_name']
+        data = {}
+        run_time = ''           #解析日志用时
+        trace_dict = {}        #日志名列表
+        if(trace_type == 'Memo'):
+            app_trace_dict, run_time, trace_dict = get_trace("Memo")
+        elif(trace_type == 'Calendar'):
+            app_trace_dict, run_time, trace_dict = get_trace("Calendar")
+        trace_list = []
+        for key,value in trace_dict.items():
+            temp_dict = {}
+            temp_dict['name'] = key
+            temp_dict['time'] = value
+            trace_list.append(temp_dict)
+        data['time'] = run_time
+        data['trace_list'] = trace_list
+        return AFDResponse(data = data)
+
+class RepresentationView(APIView):
+    def post(self, request, *args, **kwargs):
+        # classifier_fit(0,0,"FCN","Test","MCT_MTS")
+        representation_generator = request.data['representation_generator']
+        category_name = request.data['category_name']
+        current_path = os.getcwd()
+        status_file = Path(current_path + '/representation_time.txt')
+        if status_file.is_file():
+            os.remove(status_file)
+        txt_path = current_path + '/representations.txt'
+        txtWirte(txt_path, [representation_generator, category_name])
+        
+        data = {}
+        return AFDResponse(data = data)
+
+class ClassifierView(APIView):
+    def post(self, request, *args, **kwargs):
+        classifier_name = request.data['classifier_name']
+        # print(classifier_name)
+        category_name = request.data['category_name']
+        representation_generator = request.data['representation_generator']
+        os.system("taskkill -f -im tensorboard.exe")
+        current_path = os.getcwd()
+        comm = "tensorboard --logdir " + current_path + '/trained/' + classifier_name
+        # print(comm)
+        p = subprocess.Popen(comm)
+        time.sleep(2)
+        data = {}
+        return AFDResponse(data = data)
+
+class TrainingView(APIView):
+    status = 0
+    def post(self, request, *args, **kwargs):
+        classifier_name = request.data['classifier_name']
+        category_name = request.data['category_name']
+        representation_generator = request.data['representation_generator']
+        current_path = os.getcwd()
+        status_file = Path(current_path + '/status.txt')
+        if status_file.is_file():
+            os.remove(status_file)
+        txt_path = current_path + '/classifier_para.txt'
+        txtWirte(txt_path, ['0', '0', classifier_name, category_name, representation_generator])
+
+        data = {}
+        return AFDResponse(data = data)
+
+class ResultView(APIView):
+    def post(self, request, *args, **kwargs):
+        classifier_name = request.data['classifier_name']
+        category_name = request.data['category_name']
+        representation_generator = request.data['representation_generator']
+        data = {}
+        current_path = os.getcwd()
+        status_file = Path(current_path + '/status.txt')
+        if status_file.is_file():
+            # current_path = os.getcwd()
+            # result_path=os.path.join(current_path,"apps","system","detailed_results")
+            # result_path=os.path.join(result_path,classifier_name)
+            # result_path=os.path.join(result_path,"APP_TRACE_Archive_20191")
+            # result_path=os.path.join(result_path,category_name)
+            # result_path=os.path.join(result_path,"DPre")
+            # result_path=os.path.join(result_path,representation_generator)
+            # fileList=os.listdir(result_path)
+            # # print(fileList)
+            # acc=-1
+            # for item in fileList:
+            #     csv_folder_path=os.path.join(result_path,item)
+            #     tempList=os.listdir(csv_folder_path)
+            #     for _file in tempList:
+            #         if _file=="df_metrics.csv":
+            #             csvPath=os.path.join(csv_folder_path,_file)
+            #             content=pd.read_csv(csvPath)
+            #             tempAcc=content["best_model_train_acc"][0]
+            #             if acc<tempAcc:
+            #                 acc=tempAcc
+            # acc = round(acc, 6)
+            data['time'] = txtRead(status_file)[1].replace("\n","")
+            os.system("taskkill -f -im tensorboard.exe")
+            current_path = os.getcwd()
+            comm = "tensorboard --logdir " + current_path + '/apps/system/' + classifier_name
+            p = subprocess.Popen(comm)
+            time.sleep(2)
+            data['done'] = 1
+        else:
+            data['done'] = 0
+        return AFDResponse(data = data)
+
+class RepResultView(APIView):
+    def post(self, request, *args, **kwargs):
+        data = {}
+        current_path = os.getcwd()
+        status_file = Path(current_path + '/representation_time.txt')
+        if status_file.is_file():
+            data['time'] = txtRead(status_file)[0].replace("\n","")
+            data['done'] = 1
+        else:
+            data['done'] = 0
+        return AFDResponse(data = data)
+

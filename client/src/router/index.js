@@ -146,7 +146,13 @@ export const asyncRoutes = [
         name: 'Tasktype',
         component: () => import('@/views/system/tasktype'),
         meta: { title: '任务类型管理', icon: 'documentation', perms: ['tasktype_manage'] }
-      }
+      },
+      // {
+      //   path: 'test',
+      //   name: 'Test',
+      //   component: () => import('@/views/system/test'),
+      //   meta: { title: '软件测试', icon: 'documentation', perms: ['test_manage'] }
+      // }
     ]
   },
   {
@@ -191,6 +197,27 @@ export const asyncRoutes = [
             meta: { title: 'Django后台', icon: 'link', perms: ['dev_admin'] }
           }
         ]
+      }
+    ]
+  },
+  {
+    path: '/test',
+    component: Layout,
+    redirect: '/test/perm',
+    name: 'Test',
+    meta: { title: '程序功能识别子系统', icon: 'example', perms: ['dev_set'] },
+    children: [
+      {
+        path: 'perm',
+        name: 'Perm',
+        // component: () => import('@/views/system/perm'),
+        meta: { title: 'test', icon: 'example', perms: ['perm_manage'] }
+      },
+      {
+        path: 'test',
+        name: 'Test',
+        component: () => import('@/views/system/test'),
+        meta: { title: '程序功能自动识别', icon: 'documentation', perms: ['test_manage'] }
       }
     ]
   },
