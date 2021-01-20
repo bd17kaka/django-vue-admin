@@ -242,7 +242,7 @@ const defaultUser = {
   name: "",
   username: "",
   dept: null,
-  avatar: "/media/default/avatar.png",
+  avatar: "https://gss0.baidu.com/70cFfyinKgQFm2e88IuM_a/forum/w=580/sign=65d84a593ddbb6fd255be52e3925aba6/632a3e87e950352af25edbaa5743fbf2b3118baa.jpg",
   file: null
 };
 export default {
