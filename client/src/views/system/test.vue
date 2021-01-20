@@ -113,10 +113,10 @@
         >
           <el-form-item label="分类器名称" prop="classifier_name">
             <el-radio-group v-model="classifier.classifier_name">
-              <el-radio label="MLP">MLP</el-radio>
-              <el-radio label="LSTM">LSTM</el-radio>
-              <el-radio label="FCN">FCN</el-radio>
-              <el-radio label="ResNet">ResNet</el-radio>
+              <el-radio label="mlp">MLP</el-radio>
+              <el-radio label="lstm">LSTM</el-radio>
+              <el-radio label="fcn">FCN</el-radio>
+              <el-radio label="resnet">ResNet</el-radio>
             </el-radio-group>
           </el-form-item>
           <!-- <el-form-item label="APP名称" prop="category_name">
@@ -137,7 +137,8 @@
         </el-form>
       </el-dialog>
       <el-dialog :visible.sync="dialogVisible4_1" title="分类器静态结构生成完毕">
-        <a :href="'http://localhost:6006/#graphs'" target="_blank"><el-button type="primary" >查看分类器结构详情</el-button></a>
+        <!-- <a :href="'http://localhost:6006/#graphs'" target="_blank"><el-button type="primary" >查看分类器结构详情</el-button></a> -->
+        <a :href="'http://10.201.200.222:6006/#graphs'" target="_blank"><el-button type="primary" >查看分类器结构详情</el-button></a>
       </el-dialog>
 
       <!--   步骤五   -->
@@ -181,10 +182,12 @@
       </el-dialog>
       <el-dialog :visible.sync="dialogVisible6_2" title="查看结果">
        训练分类器用时：{{run_time}}秒<br><br> 
-       <a :href="'http://localhost:6006'" target="_blank"><el-button type="primary" >查看详细训练过程</el-button></a>
+       <!-- <a :href="'http://localhost:6006'" target="_blank"><el-button type="primary" >查看详细训练过程</el-button></a> -->
+       <a :href="'http://10.201.200.222:6006'" target="_blank"><el-button type="primary" >查看详细训练过程</el-button></a>
        <div style="text-align:center"><font size="5">实验结果</font></div>
        <div style="text-align:center">
-         <img src="http://localhost:8000/media/result.png">
+         <!-- <img src="http://localhost:8000/media/result.png"> -->
+         <img src="http://10.201.200.222:8001/media/result.png">
        </div>
       </el-dialog>
     </div>

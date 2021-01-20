@@ -914,7 +914,8 @@ class ResultView(APIView):
             data['time'] = txtRead(status_file)[1].replace("\n","")
             os.system("taskkill -f -im tensorboard.exe")
             current_path = os.getcwd()
-            comm = "tensorboard --logdir " + current_path + '/apps/system/' + classifier_name
+            # comm = "tensorboard --logdir " + current_path + '/apps/system/' + classifier_name
+            comm = "python3 /opt/python3/lib/python3.7/site-packages/tensorboard/main.py --logdir /proj/AFD/django-vue-admin/server/trained/" + classifier_name
             p = subprocess.Popen(comm)
             time.sleep(2)
             data['done'] = 1
