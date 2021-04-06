@@ -39,3 +39,6 @@ web.config
 
 server/server/codes/
 server/server/dataset/
+
+server/apps/system/migrations/
+server/apps/crm/migrations/
