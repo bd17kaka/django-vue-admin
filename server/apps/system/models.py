@@ -322,6 +322,7 @@ class task_type_measument(BaseModel):
     '''
     task_type_id = models.IntegerField('任务类型id')
     measurement_id = models.IntegerField('评价指标id')
+    test_test = models.CharField('测试测试', max_length=100, default='1')
 
     class Meta:
         verbose_name = '任务类型-评价指标匹配'
