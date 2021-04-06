@@ -36,3 +36,6 @@ package-lock.json
 yarn.lock
 
 web.config
+
+server/server/codes/
+server/server/dataset/
