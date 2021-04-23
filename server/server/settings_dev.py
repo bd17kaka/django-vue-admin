@@ -3,10 +3,10 @@ DEBUG = True
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.mysql',
-        'NAME': 'aishare',
+        'NAME': 'gs',
         'USER': 'root',
-        'PASSWORD': '123',
-        'HOST': '192.168.237.10',
+        'PASSWORD': '123456',
+        'HOST': '127.0.0.1',
         'PORT': '3306',
     }
 }
