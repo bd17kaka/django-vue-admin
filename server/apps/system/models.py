@@ -6,13 +6,8 @@ from django.db.models.query import QuerySet
 from utils.model import SoftModel, BaseModel
 from simple_history.models import HistoricalRecords
 #from django.contrib.postgres.fields import JSONField
-<<<<<<< HEAD
 from django_mysql.models import JSONField
-=======
 #from django_mysql.models import JSONField
->>>>>>> b47567305e7dfdebb30217f9d830a860ed8d52c8
-
-
 
 class Position(BaseModel):
     """
