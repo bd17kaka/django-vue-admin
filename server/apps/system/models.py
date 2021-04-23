@@ -6,7 +6,11 @@ from django.db.models.query import QuerySet
 from utils.model import SoftModel, BaseModel
 from simple_history.models import HistoricalRecords
 #from django.contrib.postgres.fields import JSONField
+<<<<<<< HEAD
 from django_mysql.models import JSONField
+=======
+#from django_mysql.models import JSONField
+>>>>>>> b47567305e7dfdebb30217f9d830a860ed8d52c8
 
 
 
@@ -152,7 +156,6 @@ class Dict(SoftModel):
     code = models.CharField('编号', max_length=30, null=True, blank=True)
     fullname = models.CharField('全名', max_length=1000, null=True, blank=True)
     description = models.TextField('描述', blank=True, null=True)
-    other = JSONField('其它信息', blank=True, null=True)
     type = models.ForeignKey(
         DictType, on_delete=models.CASCADE, verbose_name='类型')
     sort = models.IntegerField('排序', default=1)
