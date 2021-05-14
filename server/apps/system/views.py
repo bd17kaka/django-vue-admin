@@ -3,6 +3,7 @@ import os
 import pandas as pd
 import shutil
 import pymysql
+import datetime
 
 import paramiko
 import time
@@ -14,7 +15,7 @@ from . import system_settings
 
 from django.conf import settings
 from django.contrib.auth.hashers import check_password, make_password
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect,HttpResponse
 from django.core.cache import cache
 from django_celery_beat.models import PeriodicTask
 from django_filters.rest_framework import DjangoFilterBackend
@@ -49,6 +50,8 @@ from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           UserCreateSerializer, UserListSerializer,
                           UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer,
                           task_type_measurementSerializer, task_dataset_measurementSerializer, solution_resultSerializer)
+
+
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -798,3 +801,31 @@ def Download(request,filename):
     print("打包完毕")
     # return HttpResponseRedirect("http://localhost:8000/media/"+filename+".zip")
     return HttpResponseRedirect(system_settings.ip+"media/"+filename+".zip")
+
+
+def dashboard_data(request):
+    # 获得当天日期
+    today=datetime.date.today()
+    user_onday_num=[]
+    for i in range(7):
+        day_time=datetime.date.today() + datetime.timedelta(days=-1*i)
+        start = day_time
+        end=day_time+datetime.timedelta(days=1)
+        results = User.objects.filter(date_joined__range=(start, end))
+        user_onday_num.insert(0,len(results))
+
+    # goal_day=datetime.datetime.strptime("2020-12-14","%Y-%m-%d").date()
+    # print(goal_day)
+    # start = datetime.date(2021, 1, 5)
+    # end = datetime.date(2021, 1, 6)
+    #
+    # print(len(results))
+    # print(today)
+    # 获取某一天的
+
+    total_results={
+        "new_user_num":user_onday_num,
+    }
+    return HttpResponse(json.dumps(total_results), content_type="application/json")
+
+
