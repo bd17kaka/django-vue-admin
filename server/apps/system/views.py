@@ -4,6 +4,7 @@ import pandas as pd
 import shutil
 import pymysql
 import datetime
+import psutil
 
 import paramiko
 import time
@@ -806,6 +807,8 @@ def Download(request,filename):
 def dashboard_data(request):
     # 获得当天日期
     today=datetime.date.today()
+
+    # 统计当天以及前六天的新增用户数
     user_onday_num=[]
     for i in range(7):
         day_time=datetime.date.today() + datetime.timedelta(days=-1*i)
@@ -814,17 +817,15 @@ def dashboard_data(request):
         results = User.objects.filter(date_joined__range=(start, end))
         user_onday_num.insert(0,len(results))
 
-    # goal_day=datetime.datetime.strptime("2020-12-14","%Y-%m-%d").date()
-    # print(goal_day)
-    # start = datetime.date(2021, 1, 5)
-    # end = datetime.date(2021, 1, 6)
-    #
-    # print(len(results))
-    # print(today)
-    # 获取某一天的
+    # 获取cpu和内存利用率
+    memory_info=psutil.virtual_memory().percent
+    psutil.cpu_percent(None)
+    cpu_info=psutil.cpu_percent(None)
 
     total_results={
         "new_user_num":user_onday_num,
+        "memory_info":memory_info,
+        "cpu_info":cpu_info
     }
     return HttpResponse(json.dumps(total_results), content_type="application/json")
 
