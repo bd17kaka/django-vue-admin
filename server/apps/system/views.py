@@ -52,7 +52,7 @@ from .serializers import (DictSerializer, DictTypeSerializer, FileSerializer,
                           UserModifySerializer, MeasurementSerializer, DatasetSerializer, SolutionSerializer, TasktypeSerializer,
                           task_type_measurementSerializer, task_dataset_measurementSerializer, solution_resultSerializer)
 
-
+import random
 
 logger = logging.getLogger('log')
 # logger.info('请求成功！ response_code:{}；response_headers:{}；response_body:{}'.format(response_code, response_headers, response_body[:251]))
@@ -388,9 +388,12 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
     
     def perform_create(self, serializer):
         fileobj = self.request.data.get('file')
-        print("******", self.request.data)
+
+        # 修改文件名为唯一性
+        prefix = str(int(round(time.time() * 1000)))
+        fileobj._name = prefix + "_" + fileobj._name
+
         name = fileobj._name
-        #print(name)
         size = fileobj.size
         mime = fileobj.content_type
         type = '其它'
@@ -406,6 +409,7 @@ class FileViewSet(CreateUpdateModelBMixin, ModelViewSet):
         instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
         instance.path = settings.MEDIA_URL + name
         instance.save()
+        
         # if '_' in name:
         #     dir_name, file_name = name.split('_')
 
