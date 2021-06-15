@@ -6,7 +6,7 @@ DATABASES = {
         'NAME': 'aishare',
         'USER': 'root',
         'PASSWORD': '123456',
-        'HOST': '127.0.0.1',
+        'HOST': '10.201.200.222',
         'PORT': '3306',
     }
 }

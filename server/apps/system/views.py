@@ -750,6 +750,26 @@ class SolutionViewSet(RbacFilterSet, ModelViewSet):
             # print(temp_solution.)
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    def uploadSolution(self, serializer):
+        fileobj = self.request.data.get('file')
+        name = fileobj._name
+        size = fileobj.size
+        mime = fileobj.content_type
+        
+        #type = '其它'
+        #if 'image' in mime:
+        #     type = '图片'
+        # elif 'video' in mime:
+        #     type = '视频'
+        # elif 'audio' in mime:
+        #     type = '音频'
+        # elif 'application' or 'text' in mime:
+        #     type = '文档'
+        #
+        #instance = serializer.save(create_by = self.request.user, name=name, size=size, type=type, mime=mime)
+        #instance.path = settings.MEDIA_URL + name
+        #instance.save()
+
 class TasktypeViewSet(ModelViewSet):
     '''
     任务类型-增删改查
