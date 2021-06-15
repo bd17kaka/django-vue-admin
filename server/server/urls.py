@@ -23,6 +23,7 @@ from rest_framework_simplejwt.views import (TokenObtainPairView,
                                             TokenRefreshView)
 
 from apps.system.views import FileViewSet, LogoutView
+
 router = routers.DefaultRouter()
 router.register('file', FileViewSet, basename="file")
 
